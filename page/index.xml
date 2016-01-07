@@ -66,14 +66,14 @@
                     &lt;!--
                     &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
                         &lt;a title=&#34;LinkedIn&#34; class=&#34;btn btn-social btn-block btn-linkedin&#34;
-                            target=&#34;_BLANK&#34; href=&#34;https://www.linkedin.com/in/mmrath&#34;&gt;
-                            &lt;i class=&#34;fa fa-linkedin&#34;&gt;&lt;/i&gt; /mmrath
+                            target=&#34;_BLANK&#34; href=&#34;https://www.linkedin.com/in/vincent&#34;&gt;
+                            &lt;i class=&#34;fa fa-linkedin&#34;&gt;&lt;/i&gt; vincent
                         &lt;/a&gt;
                     &lt;/div&gt;
                     --&gt;
                     &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
                         &lt;a title=&#34;GitHub&#34; class=&#34;btn btn-social btn-block btn-github&#34;
-                            target=&#34;_BLANK&#34; href=&#34;http://github.com/mmrath&#34;&gt;
+                            target=&#34;_BLANK&#34; href=&#34;http://github.com/so0k&#34;&gt;
                             &lt;i class=&#34;fa fa-github&#34;&gt;&lt;/i&gt; so0k
                         &lt;/a&gt;
                     &lt;/div&gt;
