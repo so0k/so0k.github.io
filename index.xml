@@ -3934,7 +3934,7 @@ rm *openssl.cnf
       <pubDate>Thu, 07 Jan 2016 12:26:19 +0700</pubDate>
       <author>vincent.drl@gmail.com (Vincent De Smet)</author>
       <guid>http://so0k.github.io/2016/01/07/about-this-blog-and-my-setup/</guid>
-      <description>&lt;p&gt;This blog is meant for those notes I feel confident about releasing them to the wild. Feel free to review and use what you like.&lt;/p&gt;
+      <description>&lt;p&gt;This blog is meant for those notes I feel confident enough about to release them into the wild. Feel free to review and use what you like.&lt;/p&gt;
 
 &lt;p&gt;The static website was generated using &lt;a href=&#34;https://gohugo.io&#34;&gt;Hugo&lt;/a&gt;, which is blazingly fast and easy to deploy (even on Windows). I am in fact still using Windows, which seems to be rare for Developers these days&amp;hellip; However, at the time of writing this post - the Oculus Rift CV1 is only supported on Windows, so&amp;hellip; there&amp;rsquo;s that.&lt;/p&gt;
 
