@@ -32,7 +32,7 @@
 
 &lt;p&gt;I feel there must be a way to just get the dlls and run regsrv32, put the config files where they are expected, create some registry keys and you should be good to go. I also had to download VM Workstation installation archive and extract &lt;code&gt;vmnetcfg.exe&lt;/code&gt; from the installation package to have a decent network configuration utility, but once that&amp;rsquo;s done - working with Hyper-V became a breeze.&lt;/p&gt;
 
-&lt;p&gt;I generally list my Virtual Machines as follows:&lt;/p&gt;
+&lt;p&gt;I generally list my Virtual Machines using PowerShell as follows:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;Get-VM
 &lt;/code&gt;&lt;/pre&gt;
