@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pages on Guides and Notes by Vincent</title>
+    <link>http://so0k.github.io/page/</link>
+    <description>Recent content in Pages on Guides and Notes by Vincent</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>vincent.drl@gmail.com (Vincent De Smet)</managingEditor>
+    <webMaster>vincent.drl@gmail.com (Vincent De Smet)</webMaster>
+    <copyright>Copyright (c) 2015. All rights reserved.</copyright>
+    <lastBuildDate>Thu, 07 Jan 2016 12:26:19 +0700</lastBuildDate>
+    <atom:link href="http://so0k.github.io/page/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title></title>
+      <link>http://so0k.github.io/page/about/</link>
+      <pubDate>Thu, 07 Jan 2016 12:26:19 +0700</pubDate>
+      <author>vincent.drl@gmail.com (Vincent De Smet)</author>
+      <guid>http://so0k.github.io/page/about/</guid>
+      <description>&lt;div class=&#34;container&#34;&gt;
+  &lt;div class=&#34;row&#34;&gt;
+    &lt;div class=&#34; col-lg-offset-3 col-lg-6&#34;&gt;
+      &lt;div class=&#34;panel panel-default&#34;&gt;
+        &lt;div class=&#34;panel-body&#34;&gt;
+          &lt;div class=&#34;row&#34;&gt;
+            &lt;div class=&#34;col-lg-12&#34;&gt;
+              &lt;div class=&#34;row&#34;&gt;
+                &lt;div class=&#34;col-sm-offset-3 col-sm-6 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6&#34;&gt;
+                    &lt;img class=&#34;img-square img-responsive&#34;
+                    src=&#34;http://so0k.github.io/assets/images/profile_pic.png&#34;&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&#34;row&#34;&gt;
+            &lt;div class=&#34;col-lg-12&#34;&gt;
+              &lt;div class=&#34;row&#34;&gt;
+                &lt;div class=&#34;text-center col-sm-offset-3 col-sm-6 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6&#34;&gt;
+                  &lt;div class=&#34;&#34;&gt;
+                    &lt;h2&gt; &lt;span itemprop=&#34;name&#34;&gt;Vincent De Smet&lt;/span&gt;&lt;/h2&gt;
+                    &lt;p itemprop=&#34;jobTitle&#34;&gt;Developer&lt;/p&gt;
+                    &lt;p&gt;
+                      &lt;i class=&#34;fa fa-map-marker&#34;&gt;&lt;/i&gt; &lt;span itemprop=&#34;addressRegion&#34;&gt;Saigon, Vietnam&lt;/span&gt;
+                    &lt;/p&gt;
+                    &lt;p itemprop=&#34;email&#34;&gt; &lt;i class=&#34;fa fa-envelope&#34;&gt;&amp;nbsp;&lt;/i&gt; &lt;a href=&#34;mailto:vincent.drl@gmail.com&#34;&gt;vincent.drl@gmail.com&lt;/a&gt; &lt;/p&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+              &lt;div class=&#34;col-lg-12 centered-text&#34;&gt;
+                I am a C# developer working for a major ERP Provider in Vietnam. Docker has re-kindled my love for Linux Containers and Web Technology.
+              &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&#34;panel-footer&#34;&gt;
+          &lt;div class=&#34;row&#34;&gt;
+            &lt;div id=&#34;social-links&#34; class=&#34; col-lg-12&#34;&gt;
+                &lt;div class=&#34;row&#34;&gt;
+                  &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
+                        &lt;a title=&#34;Twitter&#34; class=&#34;btn btn-social btn-block btn-twitter&#34;
+                            target=&#34;_BLANK&#34; href=&#34;http://twitter.com/vincentdesmet&#34;&gt;
+                            &lt;i class=&#34;fa fa-twitter&#34;&gt;&lt;/i&gt; @vincentdesmet
+                        &lt;/a&gt;
+                    &lt;/div&gt;
+                    &lt;!--
+                    &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
+                        &lt;a title=&#34;LinkedIn&#34; class=&#34;btn btn-social btn-block btn-linkedin&#34;
+                            target=&#34;_BLANK&#34; href=&#34;https://www.linkedin.com/in/mmrath&#34;&gt;
+                            &lt;i class=&#34;fa fa-linkedin&#34;&gt;&lt;/i&gt; /mmrath
+                        &lt;/a&gt;
+                    &lt;/div&gt;
+                    --&gt;
+                    &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
+                        &lt;a title=&#34;GitHub&#34; class=&#34;btn btn-social btn-block btn-github&#34;
+                            target=&#34;_BLANK&#34; href=&#34;http://github.com/mmrath&#34;&gt;
+                            &lt;i class=&#34;fa fa-github&#34;&gt;&lt;/i&gt; so0k
+                        &lt;/a&gt;
+                    &lt;/div&gt;
+                    &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
+                        &lt;a title=&#34;StackOverflow&#34; class=&#34;btn btn-social btn-block btn-stackoverflow&#34;
+                            target=&#34;_BLANK&#34; href=&#34;http://stackexchange.com/users/46831/vincent-de-smet&#34;&gt;
+                            &lt;i class=&#34;fa fa-stack-overflow&#34;&gt;&lt;/i&gt; vincentdesmet
+                        &lt;/a&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

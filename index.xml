@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Guides and Notes by Vincent</title>
+    <link>http://so0k.github.io/</link>
+    <description>Recent content on Guides and Notes by Vincent</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>vincent.drl@gmail.com (Vincent De Smet)</managingEditor>
+    <webMaster>vincent.drl@gmail.com (Vincent De Smet)</webMaster>
+    <copyright>Copyright (c) 2015. All rights reserved.</copyright>
+    <lastBuildDate>Thu, 07 Jan 2016 12:26:19 +0700</lastBuildDate>
+    <atom:link href="http://so0k.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title></title>
+      <link>http://so0k.github.io/page/about/</link>
+      <pubDate>Thu, 07 Jan 2016 12:26:19 +0700</pubDate>
+      <author>vincent.drl@gmail.com (Vincent De Smet)</author>
+      <guid>http://so0k.github.io/page/about/</guid>
+      <description>&lt;div class=&#34;container&#34;&gt;
+  &lt;div class=&#34;row&#34;&gt;
+    &lt;div class=&#34; col-lg-offset-3 col-lg-6&#34;&gt;
+      &lt;div class=&#34;panel panel-default&#34;&gt;
+        &lt;div class=&#34;panel-body&#34;&gt;
+          &lt;div class=&#34;row&#34;&gt;
+            &lt;div class=&#34;col-lg-12&#34;&gt;
+              &lt;div class=&#34;row&#34;&gt;
+                &lt;div class=&#34;col-sm-offset-3 col-sm-6 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6&#34;&gt;
+                    &lt;img class=&#34;img-square img-responsive&#34;
+                    src=&#34;http://so0k.github.io/assets/images/profile_pic.png&#34;&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&#34;row&#34;&gt;
+            &lt;div class=&#34;col-lg-12&#34;&gt;
+              &lt;div class=&#34;row&#34;&gt;
+                &lt;div class=&#34;text-center col-sm-offset-3 col-sm-6 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6&#34;&gt;
+                  &lt;div class=&#34;&#34;&gt;
+                    &lt;h2&gt; &lt;span itemprop=&#34;name&#34;&gt;Vincent De Smet&lt;/span&gt;&lt;/h2&gt;
+                    &lt;p itemprop=&#34;jobTitle&#34;&gt;Developer&lt;/p&gt;
+                    &lt;p&gt;
+                      &lt;i class=&#34;fa fa-map-marker&#34;&gt;&lt;/i&gt; &lt;span itemprop=&#34;addressRegion&#34;&gt;Saigon, Vietnam&lt;/span&gt;
+                    &lt;/p&gt;
+                    &lt;p itemprop=&#34;email&#34;&gt; &lt;i class=&#34;fa fa-envelope&#34;&gt;&amp;nbsp;&lt;/i&gt; &lt;a href=&#34;mailto:vincent.drl@gmail.com&#34;&gt;vincent.drl@gmail.com&lt;/a&gt; &lt;/p&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+              &lt;div class=&#34;col-lg-12 centered-text&#34;&gt;
+                I am a C# developer working for a major ERP Provider in Vietnam. Docker has re-kindled my love for Linux Containers and Web Technology.
+              &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&#34;panel-footer&#34;&gt;
+          &lt;div class=&#34;row&#34;&gt;
+            &lt;div id=&#34;social-links&#34; class=&#34; col-lg-12&#34;&gt;
+                &lt;div class=&#34;row&#34;&gt;
+                  &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
+                        &lt;a title=&#34;Twitter&#34; class=&#34;btn btn-social btn-block btn-twitter&#34;
+                            target=&#34;_BLANK&#34; href=&#34;http://twitter.com/vincentdesmet&#34;&gt;
+                            &lt;i class=&#34;fa fa-twitter&#34;&gt;&lt;/i&gt; @vincentdesmet
+                        &lt;/a&gt;
+                    &lt;/div&gt;
+                    &lt;!--
+                    &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
+                        &lt;a title=&#34;LinkedIn&#34; class=&#34;btn btn-social btn-block btn-linkedin&#34;
+                            target=&#34;_BLANK&#34; href=&#34;https://www.linkedin.com/in/mmrath&#34;&gt;
+                            &lt;i class=&#34;fa fa-linkedin&#34;&gt;&lt;/i&gt; /mmrath
+                        &lt;/a&gt;
+                    &lt;/div&gt;
+                    --&gt;
+                    &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
+                        &lt;a title=&#34;GitHub&#34; class=&#34;btn btn-social btn-block btn-github&#34;
+                            target=&#34;_BLANK&#34; href=&#34;http://github.com/mmrath&#34;&gt;
+                            &lt;i class=&#34;fa fa-github&#34;&gt;&lt;/i&gt; so0k
+                        &lt;/a&gt;
+                    &lt;/div&gt;
+                    &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
+                        &lt;a title=&#34;StackOverflow&#34; class=&#34;btn btn-social btn-block btn-stackoverflow&#34;
+                            target=&#34;_BLANK&#34; href=&#34;http://stackexchange.com/users/46831/vincent-de-smet&#34;&gt;
+                            &lt;i class=&#34;fa fa-stack-overflow&#34;&gt;&lt;/i&gt; vincentdesmet
+                        &lt;/a&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>About This Blog and My Setup</title>
+      <link>http://so0k.github.io/2016/01/07/about-this-blog-and-my-setup/</link>
+      <pubDate>Thu, 07 Jan 2016 12:26:19 +0700</pubDate>
+      <author>vincent.drl@gmail.com (Vincent De Smet)</author>
+      <guid>http://so0k.github.io/2016/01/07/about-this-blog-and-my-setup/</guid>
+      <description>&lt;p&gt;This blog is meant for those notes I feel confident about releasing them to the wild. Feel free to review and use what you like.&lt;/p&gt;
+
+&lt;p&gt;The static website was generated using &lt;a href=&#34;https://gohugo.io&#34;&gt;Hugo&lt;/a&gt;, which is blazingly fast and easy to deploy (even on Windows). I am in fact still using Windows, which seems to be rare for Developers these days&amp;hellip; However, at the time of writing this post - the Oculus Rift CV1 is only supported on Windows, so&amp;hellip; there&amp;rsquo;s that.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;m using the &lt;a href=&#34;https://github.com/mmrath/hugo-bootstrap&#34;&gt;hugo-bootstrap&lt;/a&gt; theme and I felt the author&amp;rsquo;s personal blog source is very useful as an &lt;a href=&#34;https://github.com/mmrath/blog&#34;&gt;exampleSite&lt;/a&gt; as well.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;m currently using Windows 10 with &lt;a href=&#34;https://github.com/git-for-windows/git/wiki/FAQ&#34;&gt;git-for-windows&lt;/a&gt; and &lt;a href=&#34;https://github.com/Maximus5/ConEmu/blob/master/README.md&#34;&gt;ConEmu&lt;/a&gt;. git-for-windows provides me an &lt;code&gt;ssh&lt;/code&gt; client, &lt;a href=&#34;https://github.com/git-for-windows/git/wiki/Auto-launching-ssh-agent-when-git-starts&#34;&gt;&lt;code&gt;agent&lt;/code&gt;&lt;/a&gt; and key generator - so I do no longer need putty/puttygen and pagent. &lt;code&gt;vim&lt;/code&gt; is also included, and I&amp;rsquo;m trying to get used to it, but I still prefer to use Sublime Text.&lt;/p&gt;
+
+&lt;p&gt;The Windows edition I have comes with Hyper-V, so I&amp;rsquo;m using that instead of Virtual Box / VMWare / &amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;Hyper-V does not have a proper NAT / DHCP solution, so I&amp;rsquo;m cheating a little as I still need the excellent VMWare &lt;code&gt;vmnat.exe&lt;/code&gt; and &lt;code&gt;vmdhcp.exe&lt;/code&gt; services. I install VMWare Player just for these :( - but once Hyper-V is enabled, VMWare will refuse to work. Setting up Virtual Switches and using ICS is impractical. Switching between the Ethernet and Wifi adapters requires you to go to &lt;code&gt;control netconnections&lt;/code&gt; and share the connected adapter&amp;hellip; just&amp;hellip; no&lt;/p&gt;
+
+&lt;p&gt;I feel there must be a way to just get the dlls and run regsrv32, put the config files where they are expected, create some registry keys and you should be good to go. I also had to download VM Workstation installation archive and extract &lt;code&gt;vmnetcfg.exe&lt;/code&gt; from the installation package to have a decent network configuration utility, but once that&amp;rsquo;s done - working with Hyper-V became a breeze.&lt;/p&gt;
+
+&lt;p&gt;I generally list my Virtual Machines as follows:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;Get-VM
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and start my Virtual Machines like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$vm = Start-VM ubuntu  -Passthru
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I may monitor the connection process through the &lt;code&gt;vmconnect.exe&lt;/code&gt; program (Which has to be on the Path)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;vmconnect $env:COMPUTERNAME $vm.Name -G $vm.Id
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Once the Linux VM booted, I switch over to &lt;code&gt;git-bash&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;I have a problem with finding the IP addresses leased to my VMs, but discovered that the VMWare DHCP service stores the leases on disk under &lt;code&gt;$ProgramData/VMWare/vmnetdhcp.leases&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;I made a little function &amp;amp; alias in my &lt;code&gt;~/.bashrc&lt;/code&gt; as follows:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;function fnc_getVMleases {
+	cat $ProgramData/VMWare/vmnetdhcp.leases | egrep -o &#39;lease.*{|client-hostname.*;&#39; | awk &#39;{print $2}&#39; | xargs -n 2 | cut -d &#39;;&#39; -f 1 | awk &#39;!a[$0]++&#39;
+}
+alias lvms=fnc_getVMleases
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This uses &lt;code&gt;egrep&lt;/code&gt; to find lines that either have the &lt;code&gt;lease&lt;/code&gt; or &lt;code&gt;client-hostname&lt;/code&gt; and print the 2nd column (separated by space), feed that into &lt;code&gt;xargs&lt;/code&gt; to combine every 2 lines into 2 columns and get rid of the semicolumn at the end, finally use &lt;code&gt;awk&lt;/code&gt; to remove duplicate rows (as there are some when leases are renewed)&lt;/p&gt;
+
+&lt;p&gt;I think it could be optimized using &lt;code&gt;sed&lt;/code&gt; to define a label of rows to print.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
