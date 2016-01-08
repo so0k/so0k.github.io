@@ -39,7 +39,7 @@
                 &lt;div class=&#34;text-center col-sm-offset-3 col-sm-6 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6&#34;&gt;
                   &lt;div class=&#34;&#34;&gt;
                     &lt;h2&gt; &lt;span itemprop=&#34;name&#34;&gt;Vincent De Smet&lt;/span&gt;&lt;/h2&gt;
-                    &lt;p itemprop=&#34;jobTitle&#34;&gt;Developer&lt;/p&gt;
+                    &lt;p itemprop=&#34;jobTitle&#34;&gt;Software Engineer / Professional Services Manager&lt;/p&gt;
                     &lt;p&gt;
                       &lt;i class=&#34;fa fa-map-marker&#34;&gt;&lt;/i&gt; &lt;span itemprop=&#34;addressRegion&#34;&gt;Saigon, Vietnam&lt;/span&gt;
                     &lt;/p&gt;
@@ -48,36 +48,34 @@
                 &lt;/div&gt;
               &lt;/div&gt;
             &lt;/div&gt;
-              &lt;div class=&#34;col-lg-12 centered-text&#34;&gt;
-                I am a C# developer working for a major ERP Provider in Vietnam. Docker has re-kindled my love for Linux Containers and Web Technology.
-              &lt;/div&gt;
+            &lt;div class=&#34;col-lg-12 centered-text&#34;&gt;
+                I am a C# developer working for a major ERP Provider in Vietnam. Docker has re-kindled my love for Linux and Web Infrastructure.
+            &lt;/div&gt;
           &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class=&#34;panel-footer&#34;&gt;
           &lt;div class=&#34;row&#34;&gt;
-            &lt;div id=&#34;social-links&#34; class=&#34; col-lg-12&#34;&gt;
-                &lt;div class=&#34;row&#34;&gt;
-                  &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
+            &lt;div id=&#34;social-links&#34; class=&#34;col-lg-12&#34;&gt;
+                &lt;div class=&#34;row &#34;&gt;
+                  &lt;div class=&#34;col-xs-6 col-sm-3 col-md-3 col-lg-6 social-btn-holder&#34;&gt;
                         &lt;a title=&#34;Twitter&#34; class=&#34;btn btn-social btn-block btn-twitter&#34;
                             target=&#34;_BLANK&#34; href=&#34;http://twitter.com/vincentdesmet&#34;&gt;
                             &lt;i class=&#34;fa fa-twitter&#34;&gt;&lt;/i&gt; @vincentdesmet
                         &lt;/a&gt;
                     &lt;/div&gt;
-                    &lt;!--
-                    &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
+                    &lt;div class=&#34;col-xs-6 col-sm-3 col-md-3 col-lg-6 social-btn-holder&#34;&gt;
                         &lt;a title=&#34;LinkedIn&#34; class=&#34;btn btn-social btn-block btn-linkedin&#34;
-                            target=&#34;_BLANK&#34; href=&#34;https://www.linkedin.com/in/vincent&#34;&gt;
-                            &lt;i class=&#34;fa fa-linkedin&#34;&gt;&lt;/i&gt; vincent
+                            target=&#34;_BLANK&#34; href=&#34;https://vn.linkedin.com/in/vincentds&#34;&gt;
+                            &lt;i class=&#34;fa fa-linkedin&#34;&gt;&lt;/i&gt; vincentds
                         &lt;/a&gt;
                     &lt;/div&gt;
-                    --&gt;
-                    &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
+                    &lt;div class=&#34;col-xs-6 col-sm-3 col-md-3 col-lg-6 social-btn-holder&#34;&gt;
                         &lt;a title=&#34;GitHub&#34; class=&#34;btn btn-social btn-block btn-github&#34;
                             target=&#34;_BLANK&#34; href=&#34;http://github.com/so0k&#34;&gt;
                             &lt;i class=&#34;fa fa-github&#34;&gt;&lt;/i&gt; so0k
                         &lt;/a&gt;
                     &lt;/div&gt;
-                    &lt;div class=&#34;col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder&#34;&gt;
+                    &lt;div class=&#34;col-xs-6 col-sm-3 col-md-3 col-lg-6 social-btn-holder&#34;&gt;
                         &lt;a title=&#34;StackOverflow&#34; class=&#34;btn btn-social btn-block btn-stackoverflow&#34;
                             target=&#34;_BLANK&#34; href=&#34;http://stackexchange.com/users/46831/vincent-de-smet&#34;&gt;
                             &lt;i class=&#34;fa fa-stack-overflow&#34;&gt;&lt;/i&gt; vincentdesmet
