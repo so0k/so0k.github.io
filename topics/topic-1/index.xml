@@ -32,7 +32,13 @@
 &lt;li&gt;Some CoreOS / Systemd knowledge&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;This guide was written to be processed by the Digital Ocean Markdown parser, as such - Code Highlights may not render as expected. Refer to: &lt;a href=&#34;http://do.co/formatting&#34;&gt;http://do.co/formatting&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This guide was written to be processed by the Digital Ocean Markdown parser,as such - Code Highlights may not render as expected. Refer to: &lt;a href=&#34;http://do.co/formatting&#34;&gt;http://do.co/formatting&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;EDIT - 2016-01-08&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;article-preview:a91459261407d5d36808cf519d4f7594&#34;&gt;Article Preview:&lt;/h3&gt;
+
+&lt;p&gt;I was pointed to &lt;a href=&#34;https://www.digitalocean.com/community/markdown&#34;&gt;the Markdown Preview Generator from Digital Ocean&lt;/a&gt; and generated a &lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;Preview Here&lt;/a&gt; - this preview closely matches how the finished article should look.&lt;/p&gt;
 
 &lt;h1 id=&#34;how-to-provision-a-kubernetes-cluster-using-coreos:a91459261407d5d36808cf519d4f7594&#34;&gt;How To Provision a Kubernetes Cluster Using CoreOS&lt;/h1&gt;
 
