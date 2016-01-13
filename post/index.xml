@@ -9,8 +9,136 @@
     <managingEditor>vincent.drl@gmail.com (Vincent De Smet)</managingEditor>
     <webMaster>vincent.drl@gmail.com (Vincent De Smet)</webMaster>
     <copyright>Copyright (c) 2015. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 07 Jan 2016 12:27:33 +0700</lastBuildDate>
+    <lastBuildDate>Wed, 13 Jan 2016 09:35:36 +0700</lastBuildDate>
     <atom:link href="http://so0k.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>How to quickly get an up to date looking resume</title>
+      <link>http://so0k.github.io/2016/01/13/how-to-quickly-get-an-up-to-date-looking-resume/</link>
+      <pubDate>Wed, 13 Jan 2016 09:35:36 +0700</pubDate>
+      <author>vincent.drl@gmail.com (Vincent De Smet)</author>
+      <guid>http://so0k.github.io/2016/01/13/how-to-quickly-get-an-up-to-date-looking-resume/</guid>
+      <description>
+
+&lt;p&gt;It never hurts to keep your resume up to date and after 9 years of negligence, mine looked terribly out dated. (won&amp;rsquo;t share a picture)&lt;/p&gt;
+
+&lt;p&gt;After spending some time looking around on &lt;a href=&#34;http://resumes.reddit.com&#34;&gt;/r/resumes&lt;/a&gt;, I came across &lt;a href=&#34;http://jsonresume.org&#34;&gt;jsonresume.org&lt;/a&gt; and played around with their online resume editor.&lt;/p&gt;
+
+&lt;p&gt;Convinced this was a very useful tool I wanted to take it for a spin locally, but as I do not have Node on my freshly installed Windows 10 machine, it seems it would take a while to get it up and running locally&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;Well, this isn&amp;rsquo;t really an issue if you have a local Docker daemon (I still had a CoreOS VM with a Nodejs image ready). But if you&amp;rsquo;re on Windows, you had to do some leg work in advance, I will go through the Windows steps as well. If you do not have an appropriate Windows environment set up already, it will obviously be a LOT faster to simply install NodeJS, but I had everything pre-configured so this really just took me 5 minutes (no lies, I promise!).&lt;/p&gt;
+
+&lt;h2 id=&#34;ensure-your-docker-daemon-is-running&#34;&gt;Ensure your Docker Daemon is running&lt;/h2&gt;
+
+&lt;p&gt;Bring up the VM with PowerShell (Run As Administrator required &amp;amp; assuming you had created a CoreOS VM previously):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Powershell&#34;&gt;$vm = Start-Vm -PassThru coreos2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Monitor the boot process, or don&amp;rsquo;t (this isn&amp;rsquo;t necessary, just handy to know when CoreOS has finished booting):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Powershell&#34;&gt;vmconnect $env:COMPUTERNAME $vm.Name -G $vm.Id
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Open a shell to the VM, or just &lt;code&gt;export DOCKER_HOST=tcp://192.158.233.130:2375&lt;/code&gt; if you&amp;rsquo;ve activated the &lt;code&gt;Systemctl enable docker.socket&lt;/code&gt; (I didn&amp;rsquo;t):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;ssh core@192.168.233.130
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: You can get the IP of the VM using the &lt;code&gt;lvms&lt;/code&gt; alias I described &lt;a href=&#34;http://so0k.github.io/2016/01/07/about-this-blog-and-my-setup&#34;&gt;here&lt;/a&gt; or just read it from the Virtual Machine Connection &lt;code&gt;vmconnect&lt;/code&gt; window if you opened it earlier.&lt;/p&gt;
+
+&lt;h2 id=&#34;optionally-mount-windows-host-files-to-your-coreos-vm&#34;&gt;Optionally, Mount Windows host files to your CoreOS VM&lt;/h2&gt;
+
+&lt;p&gt;I had already configured my CoreOS to mount shared folders from my Windows host, here are the steps to achieve this, if you can&amp;rsquo;t do this yet:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Ensure the windows path is shared, mine is &amp;laquo;D:\prj\&amp;raquo;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Powershell&#34;&gt;Get-WmiObject -Class Win32_Share -Filter &amp;quot;path=&#39;D:\\prj&#39;&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If your path is not shared, you can share any path using PowerShell with the following command&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Powershell&#34;&gt;(Get-WmiObject Win32_Share -List).Create
+  (
+    &amp;quot;D:\prj\&amp;quot;, &amp;quot;prj&amp;quot;, 0
+  )
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://windowsitpro.com/powershell/managing-file-shares-windows-powershell&#34;&gt;Source&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Ensure the mount.cifs binary is available on CoreOS, I made a &lt;a href=&#34;https://hub.docker.com/r/so0k/mount.cifs_copy/&#34;&gt;popular Docker Image&lt;/a&gt; available on the Docker Hub to achieve this. The following command downloads the image and copies &lt;code&gt;mount.cifs&lt;/code&gt; to &lt;code&gt;/opt/bin/&lt;/code&gt; on the CoreOS Host:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;docker run --rm -v /opt/bin:/target so0k/mount.cifs-copy:6.4 /target
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Mount the samba share in CoreOS&lt;/p&gt;
+
+&lt;p&gt;Use the following bash script &lt;code&gt;vim mounthost.sh&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+
+
+SMB_HOST=${SMB_HOST:-192.168.233.1}
+SMB_SHARE=${SMB_SHARE:-share}
+SMB_USER=${SMB_USER:-user}
+WIN_MOUNT=${WIN_MOUNT:-/mnt/win}
+read -s -p &amp;quot;Password: &amp;quot; SMB_PASS
+printf &amp;quot;\n&amp;quot;
+printf &amp;quot;mounting drive to $WIN_MOUNT\n&amp;quot;
+sudo /opt/bin/mount.cifs //$SMB_HOST/$SMB_SHARE $WIN_MOUNT -o nolock,username=$SMB_USER,pass=$SMB_PASS,iocharset=utf8
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Make the script executable:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;chmod +x mounthost.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;set the expected env variables:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;export SMB_HOST=192.168.233.1
+export SMB_SHARE=prj
+export SMB_USER=my.username
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Run the script, you will be prompted for you password:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;./mounthost
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;start-a-nodejs-container-and-install-jsonresume&#34;&gt;Start a NodeJS container and install jsonresume&lt;/h2&gt;
+
+&lt;p&gt;Create a new container using the official NodeJS Docker Image (no tag = latest tag), this will be pulled if you do not have an image already. (I can only confirm this works with &lt;code&gt;node:0.12&lt;/code&gt; which is the version I already had on my daemon)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;docker run -it --name resume -p 4000:4000 -v /mnt/win:/mnt/win --entrypoint /bin/bash node
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This exposes port &lt;code&gt;4000&lt;/code&gt; on the container to port &lt;code&gt;4000&lt;/code&gt; on the Docker host, mounts the &lt;code&gt;/mnt/win/&lt;/code&gt; directory into the container and changes the entrypoint to &lt;code&gt;/bin/bash&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Install &lt;code&gt;resume-cli&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;npm install -g resume-cli
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;confirm all is working using&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;resume --help
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/jsonresume/resume-cli&#34;&gt;Read full instructions on the GitHub Repo&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;If you used the online editor to create a json file, copy the file to your shared folder on your windows machine and serve the file&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd /mnt/win/
+mkdir jsonresume
+cd /mnt/win/jsonresume
+ resume export cv.html --theme flat
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;At the time of writing, the resume-cli server did not work, so no live editing locally&amp;hellip; but here&amp;rsquo;s a static version of &lt;a href=&#34;http://so0k.github.io/cv.html&#34;&gt;my updated cv&lt;/a&gt; using the Flat theme..&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Kubernetes Workshop for Docker Saigon</title>
@@ -36,7 +164,7 @@
 
 &lt;h3 id=&#34;digital-ocean-article-preview-do-preview-how-to-provision-a-kubernetes-cluster-using-coreos-html&#34;&gt;&lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;Digital Ocean Article Preview&lt;/a&gt;&lt;/h3&gt;
 
-&lt;p&gt;Using the &lt;a href=&#34;https://www.digitalocean.com/community/markdown&#34;&gt;Markdown Preview Generator from Digital Ocean&lt;/a&gt; I generated and copied the article preview &lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Using the &lt;a href=&#34;https://www.digitalocean.com/community/markdown&#34;&gt;Markdown Preview Generator from Digital Ocean&lt;/a&gt; I generated and copied the article preview &lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos-v2.html&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;&lt;img src=&#34;http://so0k.github.io/assets/images/sammy-jetpack.png&#34; alt=&#34;Sammy Jetpack!&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
 
@@ -47,6 +175,12 @@
 &lt;ul&gt;
 &lt;li&gt;Added link to Article Preview&lt;/li&gt;
 &lt;li&gt;Removed full article from blog post as HighlightJS was causing rendering issues.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;EDIT - 2016-01-13&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;replaced link to Article Preview to point to v2&lt;/li&gt;
 &lt;/ul&gt;
 </description>
     </item>

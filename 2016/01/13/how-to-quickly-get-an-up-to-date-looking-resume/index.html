@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>How to quickly get an up to date looking resume  &middot; Guides and Notes by Vincent</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="Here are some simple steps if you have access to a Docker daemon, don&#39;t want to install NodeJS and quickly want to generate a nice looking resume. Ignore the Windows hurdles if you&#39;re on Linux." />
+
+<meta name="keywords" content="Docker, Nodejs, resume, Hyper-V, ">
+
+
+<meta property="og:title" content="How to quickly get an up to date looking resume  &middot; Guides and Notes by Vincent ">
+<meta property="og:site_name" content="Guides and Notes by Vincent"/>
+<meta property="og:url" content="http://so0k.github.io/2016/01/13/how-to-quickly-get-an-up-to-date-looking-resume/" />
+<meta property="og:locale" content="en-us">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:description" content="Here are some simple steps if you have access to a Docker daemon, don&#39;t want to install NodeJS and quickly want to generate a nice looking resume. Ignore the Windows hurdles if you&#39;re on Linux."/>
+<meta property="og:article:published_time" content="2016-01-13T09:35:36&#43;07:00" />
+<meta property="og:article:modified_time" content="2016-01-13T09:35:36&#43;07:00" />
+
+  
+    
+<meta property="og:article:tag" content="Docker">
+    
+<meta property="og:article:tag" content="Nodejs">
+    
+<meta property="og:article:tag" content="resume">
+    
+<meta property="og:article:tag" content="Hyper-V">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@vincentdesmet" />
+<meta name="twitter:creator" content="@vincentdesmet" />
+<meta name="twitter:title" content="How to quickly get an up to date looking resume" />
+<meta name="twitter:description" content="Here are some simple steps if you have access to a Docker daemon, don&#39;t want to install NodeJS and quickly want to generate a nice looking resume. Ignore the Windows hurdles if you&#39;re on Linux." />
+<meta name="twitter:url" content="http://so0k.github.io/2016/01/13/how-to-quickly-get-an-up-to-date-looking-resume/" />
+<meta name="twitter:domain" content="http://so0k.github.io/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "How to quickly get an up to date looking resume",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2016-01-13",
+    "description": "Here are some simple steps if you have access to a Docker daemon, don\x27t want to install NodeJS and quickly want to generate a nice looking resume. Ignore the Windows hurdles if you\x27re on Linux.",
+    "wordCount":  645 
+  }
+</script>
+
+
+
+<link rel="canonical" href="http://so0k.github.io/2016/01/13/how-to-quickly-get-an-up-to-date-looking-resume/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://so0k.github.io/touch-icon-144-precomposed.png">
+<link href="http://so0k.github.io/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+
+
+    <link rel="stylesheet" href="http://so0k.github.io/css/theme/flatly.css">
+
+
+<link rel="stylesheet" href="http://so0k.github.io/css/font-awesome.min.css">
+<link rel="stylesheet" href="http://so0k.github.io/css/style.css">
+
+
+  <link rel="stylesheet" href="http://so0k.github.io/css/highlight/default.css">
+
+
+</head>
+<body>
+    <header id="main-header">
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="http://so0k.github.io/">Guides and Notes by Vincent</a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          
+          <li>
+
+            <a href="http://so0k.github.io/page/about"
+            >
+
+            
+                <i class="fa fa-info-circle"></i>
+            
+            
+            About Me
+            </a>
+          </li>
+          
+          <li>
+
+            <a href="http://so0k.github.io/post"
+             title="Show list of posts">
+
+            
+                <i class="fa fa-files-o"></i>
+            
+            
+            Posts
+            </a>
+          </li>
+          
+          <li>
+
+            <a href="http://so0k.github.io/tags"
+             title="Show list of tags">
+
+            
+                <i class="fa fa-tags"></i>
+            
+            
+            Tags
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+      
+    </div>
+  </nav>
+
+</header>
+
+
+<div class="container">
+<div class="row">
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+  <div class="text-center">
+
+    <h1>How to quickly get an up to date looking resume
+</h1>
+
+    <div class="metas">
+<small>
+  <i class="fa fa-calendar"></i>
+  <time datetime="2016-01-13">13 Jan, 2016</time>
+</small>
+
+
+  <small>
+    &middot; by Vincent De Smet
+  
+  &middot; Read in about 4 min
+  &middot; (645 Words)
+</small>
+
+
+<div class="margin-10">
+  <i class="fa fa-tags"></i>
+  
+  <a href="http://so0k.github.io/tags/docker" class="label label-primary">Docker</a>
+  
+  <a href="http://so0k.github.io/tags/nodejs" class="label label-primary">Nodejs</a>
+  
+  <a href="http://so0k.github.io/tags/resume" class="label label-primary">resume</a>
+  
+  <a href="http://so0k.github.io/tags/hyper-v" class="label label-primary">Hyper-V</a>
+  
+
+
+</div>
+<br>
+</div>
+
+  </div>
+</div>
+
+  <div class="container content">
+  
+
+<p>It never hurts to keep your resume up to date and after 9 years of negligence, mine looked terribly out dated. (won&rsquo;t share a picture)</p>
+
+<p>After spending some time looking around on <a href="http://resumes.reddit.com">/r/resumes</a>, I came across <a href="http://jsonresume.org">jsonresume.org</a> and played around with their online resume editor.</p>
+
+<p>Convinced this was a very useful tool I wanted to take it for a spin locally, but as I do not have Node on my freshly installed Windows 10 machine, it seems it would take a while to get it up and running locally&hellip;</p>
+
+<p>Well, this isn&rsquo;t really an issue if you have a local Docker daemon (I still had a CoreOS VM with a Nodejs image ready). But if you&rsquo;re on Windows, you had to do some leg work in advance, I will go through the Windows steps as well. If you do not have an appropriate Windows environment set up already, it will obviously be a LOT faster to simply install NodeJS, but I had everything pre-configured so this really just took me 5 minutes (no lies, I promise!).</p>
+
+<h2 id="ensure-your-docker-daemon-is-running">Ensure your Docker Daemon is running</h2>
+
+<p>Bring up the VM with PowerShell (Run As Administrator required &amp; assuming you had created a CoreOS VM previously):</p>
+
+<pre><code class="language-Powershell">$vm = Start-Vm -PassThru coreos2
+</code></pre>
+
+<p>Monitor the boot process, or don&rsquo;t (this isn&rsquo;t necessary, just handy to know when CoreOS has finished booting):</p>
+
+<pre><code class="language-Powershell">vmconnect $env:COMPUTERNAME $vm.Name -G $vm.Id
+</code></pre>
+
+<p>Open a shell to the VM, or just <code>export DOCKER_HOST=tcp://192.158.233.130:2375</code> if you&rsquo;ve activated the <code>Systemctl enable docker.socket</code> (I didn&rsquo;t):</p>
+
+<pre><code class="language-bash">ssh core@192.168.233.130
+</code></pre>
+
+<p><em>Note</em>: You can get the IP of the VM using the <code>lvms</code> alias I described <a href="http://so0k.github.io/2016/01/07/about-this-blog-and-my-setup">here</a> or just read it from the Virtual Machine Connection <code>vmconnect</code> window if you opened it earlier.</p>
+
+<h2 id="optionally-mount-windows-host-files-to-your-coreos-vm">Optionally, Mount Windows host files to your CoreOS VM</h2>
+
+<p>I had already configured my CoreOS to mount shared folders from my Windows host, here are the steps to achieve this, if you can&rsquo;t do this yet:</p>
+
+<ol>
+<li><p>Ensure the windows path is shared, mine is &laquo;D:\prj\&raquo;</p>
+
+<pre><code class="language-Powershell">Get-WmiObject -Class Win32_Share -Filter &quot;path='D:\\prj'&quot;
+</code></pre>
+
+<p>If your path is not shared, you can share any path using PowerShell with the following command</p>
+
+<pre><code class="language-Powershell">(Get-WmiObject Win32_Share -List).Create
+  (
+    &quot;D:\prj\&quot;, &quot;prj&quot;, 0
+  )
+</code></pre>
+
+<p><a href="http://windowsitpro.com/powershell/managing-file-shares-windows-powershell">Source</a></p></li>
+
+<li><p>Ensure the mount.cifs binary is available on CoreOS, I made a <a href="https://hub.docker.com/r/so0k/mount.cifs_copy/">popular Docker Image</a> available on the Docker Hub to achieve this. The following command downloads the image and copies <code>mount.cifs</code> to <code>/opt/bin/</code> on the CoreOS Host:</p>
+
+<pre><code class="language-bash">docker run --rm -v /opt/bin:/target so0k/mount.cifs-copy:6.4 /target
+</code></pre></li>
+
+<li><p>Mount the samba share in CoreOS</p>
+
+<p>Use the following bash script <code>vim mounthost.sh</code>:</p>
+
+<pre><code>#!/bin/bash
+
+
+SMB_HOST=${SMB_HOST:-192.168.233.1}
+SMB_SHARE=${SMB_SHARE:-share}
+SMB_USER=${SMB_USER:-user}
+WIN_MOUNT=${WIN_MOUNT:-/mnt/win}
+read -s -p &quot;Password: &quot; SMB_PASS
+printf &quot;\n&quot;
+printf &quot;mounting drive to $WIN_MOUNT\n&quot;
+sudo /opt/bin/mount.cifs //$SMB_HOST/$SMB_SHARE $WIN_MOUNT -o nolock,username=$SMB_USER,pass=$SMB_PASS,iocharset=utf8
+</code></pre>
+
+<p>Make the script executable:</p>
+
+<pre><code>chmod +x mounthost.sh
+</code></pre>
+
+<p>set the expected env variables:</p>
+
+<pre><code>export SMB_HOST=192.168.233.1
+export SMB_SHARE=prj
+export SMB_USER=my.username
+</code></pre>
+
+<p>Run the script, you will be prompted for you password:</p>
+
+<pre><code>./mounthost
+</code></pre></li>
+</ol>
+
+<h2 id="start-a-nodejs-container-and-install-jsonresume">Start a NodeJS container and install jsonresume</h2>
+
+<p>Create a new container using the official NodeJS Docker Image (no tag = latest tag), this will be pulled if you do not have an image already. (I can only confirm this works with <code>node:0.12</code> which is the version I already had on my daemon)</p>
+
+<pre><code class="language-bash">docker run -it --name resume -p 4000:4000 -v /mnt/win:/mnt/win --entrypoint /bin/bash node
+</code></pre>
+
+<p>This exposes port <code>4000</code> on the container to port <code>4000</code> on the Docker host, mounts the <code>/mnt/win/</code> directory into the container and changes the entrypoint to <code>/bin/bash</code>.</p>
+
+<p>Install <code>resume-cli</code></p>
+
+<pre><code>npm install -g resume-cli
+</code></pre>
+
+<p>confirm all is working using</p>
+
+<pre><code>resume --help
+</code></pre>
+
+<p><a href="https://github.com/jsonresume/resume-cli">Read full instructions on the GitHub Repo</a></p>
+
+<p>If you used the online editor to create a json file, copy the file to your shared folder on your windows machine and serve the file</p>
+
+<pre><code>cd /mnt/win/
+mkdir jsonresume
+cd /mnt/win/jsonresume
+ resume export cv.html --theme flat
+</code></pre>
+
+<p>At the time of writing, the resume-cli server did not work, so no live editing locally&hellip; but here&rsquo;s a static version of <a href="http://so0k.github.io/cv.html">my updated cv</a> using the Flat theme..</p>
+
+</div>
+
+
+  <footer>
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      
+  
+    <nav><ul class="pager">
+    
+        <li class="previous">
+          <a href="http://so0k.github.io/2016/01/07/kubernetes-workshop-for-docker-saigon/" title="Kubernetes Workshop for Docker Saigon">
+            <span aria-hidden="true">&larr;</span>Previous
+          </a>
+        </li>
+    
+
+    
+    </ul> </nav>
+  
+
+
+</div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+  
+
+</div>
+
+</footer>
+
+
+</div>
+</div>
+      <footer class="footer">
+    <div class="container hidden-print">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+           <div class="pull-left">
+  <a class="toplink" href="#">back to top</a>
+</div>
+<div class="pull-right">
+  
+</div>
+
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
+          <small>
+              
+    
+<div class="container footline">
+  
+
+</div>
+
+
+    
+<div class="container copyright">
+  
+  Copyright &copy; 2015. All rights reserved.
+
+
+</div>
+
+
+
+          </small>
+        </div>
+     </div>
+    </div>
+</footer>
+
+    <script src="http://so0k.github.io/js/jquery.min-2.1.4.js"></script>
+<script src="http://so0k.github.io/js/bootstrap.min-3.3.5.js"></script>
+
+
+
+
+<script src="http://so0k.github.io/js/highlight.pack.js"></script>
+<script src="http://so0k.github.io/js/site.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+<script>
+  var _gaq=[['_setAccount','UA-72129772-1'],['_trackPageview']];
+  (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+  g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+  s.parentNode.insertBefore(g,s)}(document,'script'));
+</script>
+
+
+  </body>
+</html>
+

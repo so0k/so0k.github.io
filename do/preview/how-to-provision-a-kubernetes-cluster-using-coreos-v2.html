@@ -29,34 +29,32 @@
       <div class="pure-u-1-1">
         <div class="question-single">
           <div id="markdown-preview-output" class="markdown-preview-output question-content content-body">
-<!-- PREVIEW CONTENT HERE -->      
-
+<!-- PREVIEW CONTENT HERE -->
 <h1 id="how-to-provision-a-kubernetes-cluster-using-coreos">How To Provision a Kubernetes Cluster Using CoreOS</h1>
 
 <h3 id="introduction">Introduction</h3>
 
-<p>Kubernetes is a system designed by Google to manage applications built within containers across a cluster of nodes. It handles the entire life cycle of a containerized application including deployment and scaling.</p>
+<p>Kubernetes, often abreviated as k8s, is a system designed to manage applications built within containers across a cluster of nodes. It handles the entire life cycle of a containerized application including deployment and scaling. Kubernetes was designed within Google and released as open source.</p>
 
-<p>With AWS, Red Hat, Microsoft, IBM, Mirantis OpenStack, and VMware (and the list keeps growing) working to integrate Kubernetes into their platforms, going through this tutorial will provide you with a strong foundation and fundamental understanding of a framework that is here to stay.</p>
+<p>With AWS, Red Hat, Microsoft, IBM, Mirantis OpenStack, and VMware (and the list keeps growing) working to integrate Kubernetes into their platforms, going through this tutorial will provide you with a working cluster on Digital Ocean and a strong foundation as well as fundamental understanding of a framework that is here to stay.</p>
 
 <p>In this tutorial, we will give step-by-step instructions on how to create a single-controller/multi-worker Kubernetes cluster on CoreOS hosted by Digital Ocean. This system will allow us to group related services together for deployment as a unit on a single host using what Kubernetes calls "<a href="https://coreos.com/kubernetes/docs/latest/pods.html" rel="nofollow">Pods</a>". Kubernetes also provides health checking functionality, high availability, and efficient usage of resources through schedulers.</p>
 
-<p>This tutorial was tested with Kubernetes v1.1.2. Keep in mind that this software changes frequently. To see your version, once it's installed, run:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">kubectl version
-</li></ul></code></pre>
+<p>This tutorial was tested with Kubernetes v1.1.2. Keep in mind that this software changes frequently.</p>
+
 <h3 id="prerequisites-and-goals">Prerequisites and goals</h3>
 
 <p>We will provision each component of our Kubernetes cluster as part of this tutorial, no existing architecture is required. Experience with Docker is expected, experience with Systemd and CoreOS is a plus, but each concept is introduced and explained as part of this tutorial. If you are not familiar with CoreOS, it may be helpful to review <a href="https://www.digitalocean.com/community/tutorials/an-introduction-to-coreos-system-components" rel="nofollow">some basic information about the CoreOS system</a>.</p>
 
-<p>After a high-level overview of the Kubernetes Architecture, we will configure our client machine to work with our Digital Ocean resources from the terminal using Doctl &amp; Jq. Once this is done we will be able to quickly and repeatedly provision our droplets with <code>cloud-config</code> files. This allows us to declaratively customize network configuration, Systemd units, and other OS-level items.</p>
+<p>After a high-level overview of the Kubernetes Architecture, we will configure our client machine to work with our Digital Ocean resources from the terminal using Doctl &amp; Jq. Once this is done we will be able to quickly and repeatedly provision our droplets with <code>cloud-config</code> files. This allows us to declaratively customize network configuration, Systemd units, and other OS-level items. We will also ensure a Public Key Infrastructure (PKI) is available by going through the instructions to set up a local Certificate Authority.</p>
 
-<p>We will first provision an Etcd cluster to reliably provide storage of meta data across a cluster of machines. Etcd provides a great way to store configuration data reliably for Kubernetes. Thanks to the watch support provided by Etcd, coordinating components can be notified very quickly of changes. This component is crucial to our Kubernetes cluster.</p>
+<p>Will then first provision an Etcd cluster to reliably provide storage of meta data across a cluster of machines. Etcd provides a great way to store configuration data reliably for Kubernetes. Thanks to the watch support provided by Etcd, coordinating components can be notified very quickly of changes. This component is crucial to our Kubernetes cluster.</p>
 
 <p>With the help of our Etcd cluster, we will also configure <a href="https://coreos.com/flannel/docs/latest/flannel-config.html" rel="nofollow">Flannel</a>, a network fabric layer that provides each machine with an individual subnet for container communication. This satisfies a fundamental requirement for running a Kubernetes cluster. Docker will be configured to use this networking layer for its containers. </p>
 
 <p>We will provision our Kubernetes controller Droplet and to ensure the security of our Kubernetes cluster, we will generate the required certificates for communication between Kubernetes components using <code>openssl</code> &amp; securely transfer these using <code>scp</code> to each Droplet. We will configure the command line client utility, <code>kubectl</code>, to work with our cluster from our client next.</p>
 
-<p>Finally, we will provision worker nodes pointing to the controller nodes and deploy the internal cluster DNS through the DNS add-on. We will have a fully functional Kubernetes cluster allowing us to deploy our workloads and easily add worker nodes as required with the <code>cloud-config</code> files defined in this tutorial.</p>
+<p>Finally, we will provision worker nodes pointing to the controller nodes and deploy the internal cluster DNS through the DNS add-on. We will have a fully functional Kubernetes cluster allowing us to deploy our workloads and easily add worker nodes as required with the <code>cloud-config</code> files created through this tutorial.</p>
 
 <p>Working through this tutorial may take you a few hours, but it will give you a good understanding of the moving pieces of your cluster and set you up for success in the long run.</p>
 
@@ -68,17 +66,17 @@
 
 <p>At a high level, we need to differentiate the services that run on every node, referred to as node agents (<code>kubelet</code>, ... ), the controller services (APIs, scheduler, ...) that compose the cluster-level control plane and the distributed storage solution (Etcd).</p>
 
-<p>A crucial component on every node is the <strong>kubelet</strong>. The kubelet is responsible for what's running on each individual Droplet and making sure it keeps running. The kubelet controls the container runtime, in this tutorial <strong>Docker</strong> provides the container runtime and must also run on each node. Docker takes care of the details of downloading images and running containers. The kubelet registers nodes with the cluster, sends events and status updates and reports the resource utilization of the node.</p>
+<p>A crucial component which runs on every node is the <strong>kubelet</strong>. The kubelet is responsible for what's running on each individual Droplet and making sure it keeps running. The kubelet controls the container runtime, in this tutorial <strong>Docker</strong> provides the container runtime and must also run on each node. Docker takes care of the details of downloading images and running containers. The kubelet registers nodes with the cluster, sends events and status updates and reports the resource utilization of the node.</p>
 
 <p>To facilitate routing between containers as well as simplify service discovery, each node also runs the <strong>kube-proxy</strong>. The proxy is a simple network proxy and load balancer which can do simple TCP and UDP stream forwarding (round robin) across a set of back ends. The proxy is a crucial part for the Kubernetes services model. The proxy communicates with the controller services to keep up to date. See the <a href="https://github.com/kubernetes/kubernetes/wiki/Services-FAQ" rel="nofollow">Kubernetes' services FAQ</a> for more details.</p>
 
 <p>Worker node services are configured to be managed from the controller services. &lt;!-- this is meant to highlight the difference between the same service deployed on worker nodes vs controller nodes. On worker nodes, the services register with the controller nodes, on controller nodes they are often bootstrapped... --&gt;</p>
 
-<p>The first controller service we will highlight is the <strong>API server</strong>. The API server serves up the <a href="http://kubernetes.io/v1.1/docs/api.html" rel="nofollow">Kubernetes API</a> through a REST interface. It is intended to be a CRUD-y service, with most/all business logic implemented in separate components or in plug-ins. It's responsible for validating the requests and updating the corresponding objects in Etcd. The API server is void of state and will be the main component replicated and load balanced across controller nodes in a High Availability configuration.</p>
+<p>The first controller service we will highlight is the <strong>API server</strong>. The API server serves up the <a href="http://kubernetes.io/v1.1/docs/api.html" rel="nofollow">Kubernetes API</a> through a REST interface. It is intended to be a CRUD-y service, with most/all business logic implemented in separate components or in plug-ins. It is responsible for validating the requests and updating the corresponding objects in Etcd. The API server is void of state and will be the main component replicated and load balanced across controller nodes in a High Availability configuration.</p>
 
-<p>The second controller service to highlight is the <strong>scheduler</strong>. The scheduler is responsible for assigning workloads to nodes in the cluster. This component uses the <a href="http://kubernetes.io/v1.1/docs/api-reference/v1/definitions.html#_v1_binding" rel="nofollow">binding</a> API to achieve this. The scheduler is pluggable and support for multiple cluster schedulers and even user-provided schedulers is expected, but not available yet when this tutorial was written.</p>
+<p>The second controller service to highlight is the <strong>scheduler</strong>. The scheduler is responsible for assigning workloads to nodes in the cluster. This component watches the API Server and uses the <a href="http://kubernetes.io/v1.1/docs/api-reference/v1/definitions.html#_v1_binding" rel="nofollow">binding</a> API to apply its scheduling decisions. The scheduler is pluggable and support for multiple cluster schedulers and even user-provided schedulers is expected, but not available yet in version 1.1.2.</p>
 
-<p>All other cluster-level functions are performed by the <strong>controller manager</strong> component at the time of writing. This component embeds the core control loops shipped with Kubernetes. Each controller is a control loop that watches the shared state of the cluster through the API Server and makes changes attempting to move the current state towards the desired state. These controllers may eventually be split into separate components in future Kubernetes versions to make them independently pluggable.</p>
+<p>All other cluster-level functions are performed by the <strong>controller manager</strong> component at the time of writing. This component embeds the core control loops shipped with Kubernetes. Each controller is an active manager that watches the shared state of the cluster through the API Server and makes changes attempting to move the observed state towards the desired state. These controllers may eventually be split into separate components in future Kubernetes versions to make them independently pluggable.</p>
 
 <p>As the scheduler and controller manager components modify cluster state, only one instance of each can run within the cluster. In High Availability configurations a process of master election is required for these components. We will explain and apply master election for these components as part of this tutorial, we will however only provision 1 controller node and no control plane load balancer. Setting up the control plane load balancers and appropriate TLS artifacts are left as an exercise for the reader.</p>
 
@@ -159,7 +157,7 @@
 
 <h3 id="setting-up-doctl">Setting up Doctl</h3>
 
-<p>To use Doctl from your terminal and follow the Kubernetes cluster config from this tutorial, you will need to generate a Personal Access Token with write permissions through the Digital Ocean Control Panel. Refer to <a href="https://www.digitalocean.com/community/tutorials/how-to-use-the-digitalocean-api-v2#how-to-generate-a-personal-access-token" rel="nofollow">this tutorial</a> for information on how to do this, continue with these steps once you have your Personal Access Token ready.</p>
+<p>To use Doctl from your terminal and follow the Kubernetes cluster config from this tutorial, you will need to generate a Personal Access Token with write permissions through the Digital Ocean Control Panel. Refer to the <a href="https://www.digitalocean.com/community/tutorials/how-to-use-the-digitalocean-api-v2#how-to-generate-a-personal-access-token" rel="nofollow">How To Use the DigitalOcean API v2</a> tutorial for information on how to do this, continue with these steps once you have your Personal Access Token ready.</p>
 
 <p>For all of the steps in this tutorial, we will assign our token to a variable called <code>DIGITALOCEAN_API_KEY</code>. For example, by running the following command in bash (replace the highlighted text with your own token):</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">export DIGITALOCEAN_API_KEY=<span class="highlight">77e027c7447f468068a7d4fea41e7149a75a94088082c66fcf555de3977f69d3</span>
@@ -190,7 +188,7 @@
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">curl -Lo ~/doctl.tar.bz2 https://github.com/digitalocean/doctl/releases/download/0.0.16/linux-amd64-doctl.tar.bz2
 </li></ul></code></pre>
 <p>Next, we need to extract the downloaded archive. We will also need to add <code>doctl</code> to a location included in our <code>PATH</code> environment variable, <code>/usr/bin</code> or <code>/opt/bin</code> for example. The following command will extract <code>doctl</code> directly to <code>/usr/bin</code> making it available for all users on a Linux host. This command requires <code>sudo</code> rights:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="#">tar xjf doctl.tar.bz2 -C /usr/bin
+<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="#">tar xjf ~/doctl.tar.bz2 -C /usr/bin
 </li></ul></code></pre>
 <p>Finally, validate that <code>doctl</code> has been downloaded successfully by confirming the installed version:</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">doctl --version
@@ -200,14 +198,14 @@
 </code></pre>
 <h3 id="finding-help-about-doctl">Finding help about Doctl</h3>
 
-<p>An overview of Doctl and several usage examples are available on <a href="https://github.com/digitalocean/doctl" rel="nofollow">the Doctl GitHub repository</a>. Additionally, invoking Doctl without any arguments will print out usage instructions as well. Note that every Digital Ocean resource type has a corresponding Doctl command. Every command has subcommands to manage the resource as well as instructions available through the <code>help</code> subcommand or the <code>--help</code> flag. </p>
+<p>An overview of Doctl and several usage examples are available on <a href="https://github.com/digitalocean/doctl" rel="nofollow">the Doctl GitHub repository</a>. Additionally, invoking Doctl without any arguments will print out usage instructions as well. Note that every Digital Ocean resource type (droplet, sshkey, ...) has a corresponding Doctl command. Every command has subcommands to manage the resource as well as instructions available through the <code>help</code> subcommand or the <code>--help</code> flag. </p>
 
 <p>For example, to review the available commands for <code>droplet</code> resources, run:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">doctl droplet help
+<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">doctl <span class="highlight">droplet</span> help
 </li></ul></code></pre>
 <p>This should return:</p>
 <pre class="code-pre "><code langs=""><div class="secondary-code-label " title="Output">Output</div>NAME:
-   doctl droplet - Droplet commands. Lists by default.
+   doctl droplet - Droplet commands. <span class="highlight">Lists by default.</span>
 
 USAGE:
    doctl droplet [global options] command [command options] [arguments...]
@@ -235,7 +233,7 @@ GLOBAL OPTIONS:
 <p>Notice that the <code>droplet</code> command will <code>list</code> droplets by default. </p>
 
 <p>To get more information about the <code>droplet</code> <code>create</code> command, run:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">doctl droplet create --help
+<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">doctl droplet help create
 </li></ul></code></pre>
 <p>This should return:</p>
 <pre class="code-pre "><code langs=""><div class="secondary-code-label " title="Output">Output</div>NAME:
@@ -258,6 +256,9 @@ OPTIONS:
    --private-networking, -p             Turn on private networking.
    --wait-for-active                    Don't return until the create has succeeded or failed.
 </code></pre>
+<p>As another example, to list all Droplet sizes provided by Digital Ocean run:</p>
+<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">doctl droplet size list
+</li></ul></code></pre>
 <h3 id="setting-up-your-ssh-keys-with-doctl">Setting up your SSH Keys with Doctl</h3>
 
 <p>Every CoreOS droplet that you will provision for your Kubernetes cluster, will need to have at least one SSH public key installed during its creation process. The key(s) will be installed to the <code>core</code> user's authorized keys file, and you will need the corresponding private key(s) to log in to your CoreOS server.</p>
@@ -265,7 +266,8 @@ OPTIONS:
 <p>If you do not already have any SSH keys associated with your Digital Ocean account, do so now by following steps one and two of this tutorial: <a href="https://www.digitalocean.com/community/tutorials/how-to-use-ssh-keys-with-digitalocean-droplets" rel="nofollow">How To Use SSH Keys with Digital Ocean Droplets</a>. You may opt to use Doctl to add the new SSH keys to your account rather then copying the SSH Keys into the Digital Ocean control panel manually. This can be achieved by passing in your <code>DIGITALOCEAN_API_KEY</code> environment variable as the <code>--api-key</code> to Doctl and adding the public key of your newly created SSH key with the following command:</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">doctl --api-key $DIGITALOCEAN_API_KEY keys create &lt;key-name&gt; &lt;path-to-public-key&gt;
 </li></ul></code></pre>
-<p><strong>Note</strong>: Doctl will automatically try to use the <code>$DITIGALOCEAN_API_KEY</code> env variable as the <code>--api-key</code> if it exists and we do not need to explicitly pass it in every time. We will omit this in future Doctl commands.<br></p>
+
+<p><span class="note"><strong>Note</strong>: Doctl will automatically try to use the <code>$DITIGALOCEAN_API_KEY</code> env variable as the <code>--api-key</code> if it exists and we do not need to explicitly pass it in every time. We will omit this in future Doctl commands.<br></span> </p>
 
 <p>Add your private key to your SSH agent on your client machine, using <code>ssh-agent</code> as follows:</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">ssh-add &lt;path-to-private-key&gt;
@@ -273,14 +275,14 @@ OPTIONS:
 <p>or use the <code>-i &lt;path-to-private-key&gt;</code> flag each time connecting to your droplets over <code>ssh</code> if you do not have a running <code>ssh-agent</code>.</p>
 
 <p>For example, in this tutorial we will store our key pair in our home directory as <code>~/.ssh/id_rsa</code> and upload the public key as <code>k8s-key</code> to our Digital Ocean account, combining all the above steps together, would look like this:</p>
-<pre class="code-pre "><code langs=""><div class="secondary-code-label " title="Output">Output</div># Generate the key pair
+<pre class="code-pre "><code langs=""><div class="secondary-code-label " title="Output">Output</div><span class="highlight"># Generate the key pair</span>
 ssh-keygen -t rsa
 Generating public/private rsa key pair.
-Enter file in which to save the key (/home/demo/.ssh/id_rsa):
+Enter file in which to save the key (/home/demo/.ssh/id_rsa):<span class="highlight">/home/demo/.ssh/id_k8s</span>
 Enter passphrase (empty for no passphrase): 
 Enter same passphrase again: 
-Your identification has been saved in /home/demo/.ssh/id_rsa.
-Your public key has been saved in /home/demo/.ssh/id_rsa.pub.
+Your identification has been saved in /home/demo/.ssh/id_k8s.
+Your public key has been saved in /home/demo/.ssh/id_k8s.pub.
 The key fingerprint is:
 4a:dd:0a:c6:35:4e:3f:ed:27:38:8c:74:44:4d:93:67 demo@a
 The key's randomart image is:
@@ -295,10 +297,10 @@ The key's randomart image is:
 |           . o   |
 |                 |
 +-----------------+
-# Upload public key to Digital Ocean account as k8s-key
-doctl keys create k8s-key /home/demo/.ssh/id_rsa.pub
-# Add private key to SSH Agent
-ssh-add ~/.ssh/id_rsa
+<span class="highlight"># Upload public key to Digital Ocean account as k8s-key</span>
+doctl keys create k8s-key <span class="highlight">/home/demo/.ssh/id_k8s.pub</span>
+<span class="highlight"># Add private key to SSH Agent</span>
+ssh-add ~/.ssh/id_k8s
 </code></pre>
 <h3 id="managing-droplets-with-doctl">Managing Droplets with Doctl</h3>
 
@@ -347,13 +349,13 @@ Are you sure you want to continue connecting (yes/no)?
 
 <p>You should now be connected to a fully functional CoreOS droplet running in Digital Ocean. </p>
 
-<p>Press <code>CTRL+D</code> or enter <code>exit</code> to log out. Keep the <code>do-test</code> droplet running to complete the exercises in the next section.</p>
+<p>Press <code>CTRL+D</code> or enter <code>exit</code> to log out of your Droplet, but keep the <code>do-test</code> droplet running to complete the exercises in the next section.</p>
 
 <h3 id="working-with-doctl-responses">Working with Doctl responses</h3>
 
 <p>By default, Doctl will return yaml responses, but it is possible to change the format of the response with the <code>-f</code> flag. Using the <code>json</code> format will allow us to easily act on the data returned by Doctl through the Command-line JSON processor <a href="https://github.com/stedolan/jq" rel="nofollow">Jq</a>. </p>
 
-<p>Jq comes installed on several Linux distributions (i.e. CoreOS). However, to download and setup Jq manually, review <a href="https://github.com/digitalocean/doctl/releases/latest" rel="nofollow">the latest releases</a> and choose the right release  for your environment:</p>
+<p>Jq comes installed on several Linux distributions (i.e. CoreOS). However, to download and setup Jq manually, review <a href="https://github.com/stedolan/jq/releases/latest" rel="nofollow">the latest releases</a> and choose the right release  for your environment:</p>
 
 <table class="pure-table"><thead>
 <tr>
@@ -454,7 +456,7 @@ write_files:
     permissions: "0644"
     owner: "root"
     content: |
-      Good news, everyone!
+      <span class="highlight">Good news, everyone!</span>
 coreos:
   update:
     group: alpha
@@ -496,19 +498,49 @@ Someone could be eavesdropping on you right now (man-in-the-middle attack)!
 It is also possible that a host key has just been changed.
 ...
 </code></pre>
-<p>If this is the case, your new droplet probably has the same IP address as the old, destroyed droplet, but it has a different host SSH key. This is fine, and you can remove the warning, by deleting the old droplet's host key from your system, with this command (replacing <code>$SERVER_IP_ADDRESS</code> with your droplet public ip):</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">ssh-keygen -R $SERVER_IP_ADDRESS
+<p>If this is the case, your new droplet probably has the same IP address as the old, destroyed droplet, but it has a different host SSH key. This is fine, and you can remove the warning, by deleting the old droplet's host key from your system, with this command (replacing the highlighted IP address with your droplet public IP):</p>
+<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">ssh-keygen -R <span class="highlight">37.139.21.41</span>
 </li></ul></code></pre>
 <p>Now try connecting to your server again.</p>
 
 <p>Finally, destroy this test droplet with a command similar to below:</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">doctl d d ccfg-test.$region
 </li></ul></code></pre>
-<p><strong>Note</strong>: At the time of writing, user provided <code>cloud-config</code> files can not be modified once a droplet has been created. To change the <code>cloud-config</code> the droplets need to be re-created. Take this into consideration when writing cloud-config files which limit ssh access to certain user accounts as these may be reset after every reboot.</p>
+
+<p><span class="note"><strong>Note</strong>: At the time of writing, user provided <code>cloud-config</code> files can not be modified once a droplet has been created. To change the <code>cloud-config</code> the droplets need to be re-created. Take this into consideration when writing cloud-config files which limit ssh access to certain user accounts as these may be reset after every reboot.</span></p>
 
 <p>With the above commands in our toolbox, we are ready to start a highly automated Kubernetes configuration on Digital Ocean.</p>
 
-<h2 id="step-2-—-provisioning-the-data-storage-back-end">Step 2 — Provisioning The Data Storage Back End.</h2>
+<h2 id="step-2-—-initializing-the-kubernetes-cluster-pki">Step 2 — Initializing The Kubernetes Cluster PKI</h2>
+
+<p>In this tutorial we will configure the Kubernetes API Server to use client certificate authentication to enable encryption and prevent traffic interception and man-in-the-middle attacks. This means it is necessary to have a Certificate Authority (CA) which will be trusted as the root authority for the cluster and use it to generate the proper credentials. The necessary assets can also be generated from an existing Public Key Infrastructure (PKI), if already available.</p>
+
+<p>For this tutorial we will use Self-Signed certificates. Every certificate is created by submitting Certificate Signing Requests (CSRs) to a CA. A CSR contains information identifying whom the certificate request is for, including the public key associated with the private key of the requesting party. The CA will sign the CSR, effectively returning what is from then on referred to as "the certificate".</p>
+
+<p>For a detailed overview of OpenSSL, refer to the <a href="https://www.digitalocean.com/community/tutorials/openssl-essentials-working-with-ssl-certificates-private-keys-and-csrs" rel="nofollow">OpenSSL Essentials guide</a> on Digital Ocean.</p>
+
+<h3 id="initialize-cluster-root-ca">Initialize Cluster Root CA</h3>
+
+<p>Generate the private key for your root certificate into the default <code>$HOME/.kube</code> folder, which we should have created as part of our client machine setup, with the following OpenSSL command to generate a 2048 bit RSA private key:</p>
+<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">openssl genrsa -out ~/.kube/ca-key.pem 2048
+</li></ul></code></pre>
+<p>This <code>ca-key.pem</code> private key will be used to generate the self-signed <code>ca.pem</code> certificate which will be trusted by all your Kubernetes components, as well as every Worker node and Administrator key pair. This key needs to be closely guarded and kept in a secure location for future use. </p>
+
+<p>Next, use the private key to generate the self-signed root <code>ca.pem</code> certificate with the following openssl command:</p>
+<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">openssl req -x509 -new -nodes -key ~/.kube/ca-key.pem -days 10000 -out ~/.kube/ca.pem -subj "/CN=kube-ca"
+</li></ul></code></pre>
+<p>The <code>ca.pem</code> certificate will be used as the root certificate to verify the authenticity of certificates by every component within your Kubernetes cluster, you will copy this file to the controller and worker Droplets as well as the Administrator clients.</p>
+
+<p>Confirm your Root CA assets exist in the expected location:</p>
+<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">ls -1 ~/.kube/ca*.pem
+</li></ul></code></pre>
+<p>Output similar to:</p>
+<pre class="code-pre "><code langs=""><div class="secondary-code-label " title="Output">Output</div>/home/demo/.kube/ca.pem  
+/home/demo/.kube/ca-key.pem
+</code></pre>
+<p>We now have all the necessary ingredients to generate certificates for all of our cluster components. We will come back to <code>openssl</code> to generate each as required.</p>
+
+<h2 id="step-3-—-provisioning-the-data-storage-back-end">Step 3 — Provisioning The Data Storage Back End.</h2>
 
 <p>No matter if you are using Swarm with Docker overlay networks or Kubernetes, a data storage back end is required for the infrastructure meta data.</p>
 
@@ -516,28 +548,29 @@ It is also possible that a host key has just been changed.
 
 <p>Your Etcd cluster will be heavily utilized since all objects are stored within and every scheduling decision is recorded. It is recommended that you run a multi-droplet cluster to gain maximum performance and reliability of this important part of your Kubernetes cluster. Of your Kubernetes components, you should only give the <code>kube-apiserver</code> component read/write access to Etcd. You do not want the Etcd cluster used by Kubernetes exposed to every node in your cluster (or worse, to the Internet at large), because access to Etcd is equivalent to root in your cluster.</p>
 
-<p>&lt;!-- TODO: We should share Etcd with flannel..., it means Etcd is exposed on every node... --&gt;</p>
+<p>&lt;!-- TODO: We should not share Etcd with flannel..., it means Etcd is exposed on every node..., but we still do in this tutorial... --&gt;</p>
 
-<p>For development &amp; testing environments, a single droplet running Etcd will suffice. </p>
+<p>For development &amp; testing environments, a single droplet running Etcd and shared between the Kubernetes API server and Flannel will suffice. </p>
 
 <p>For production environments it is highly recommended that Etcd is ran as a dedicated cluster separately from Kubernetes components. Use the <a href="https://coreos.com/os/docs/latest/cluster-architectures.html" rel="nofollow">CoreOS cluster architecture overview</a> as well as the <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/clustering.md" rel="nofollow">official Etcd clustering guide</a> to bootstrap a new Etcd cluster on Digital Ocean. If you do not have an existing Etcd cluster, you can bootstrap a fresh Etcd cluster on Digital Ocean either by:</p>
 
 <ul>
-<li>Using the <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/clustering.md#public-etcd-discovery-service" rel="nofollow">public Etcd discovery service</a> or</li>
+<li>Using the <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/clustering.md#public-etcd-discovery-service" rel="nofollow">public Etcd discovery service</a>,</li>
+<li>Deploying your own <a href="https://github.com/coreos/discovery.etcd.io" rel="nofollow">private Etcd Discovery service</a> or</li>
 <li>Using <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/clustering.md#dns-discovery" rel="nofollow">DNS discovery</a></li>
 </ul>
 
 <p>Additionally, refer to the official Etcd guides on <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/security.md" rel="nofollow">securing your Etcd cluster</a> and to get a <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/configuration.md" rel="nofollow">full overview of Etcd configuration flags</a></p>
 
-<p>In this tutorial, instead of being slowed down and distracted by generating new discovery URLs and bootstrapping Etcd, it's easier to start a single Etcd node. Since the full Etcd daemon isn't running on all of the machines, we'll gain a little bit of extra CPU and RAM to play with. However, for ease of configuration of all the cluster services, we will run a local Etcd in <strong>proxy mode</strong> on every Worker node (this daemon will listen on localhost and proxy all requests to the Etcd node). This allows us to configure every cluster component with the local Etcd proxy.</p>
+<p>In this tutorial, instead of being slowed down and distracted by generating new discovery URLs and bootstrapping Etcd, it's easier to start a single Etcd node. Since the full Etcd daemon isn't running on all of the machines, we'll gain a little bit of extra CPU and RAM to play with. However, for ease of configuration of all the cluster services, we will run a local Etcd in <strong>proxy mode</strong> on every Worker node (this daemon will listen on localhost and proxy all requests to the Etcd node). This allows us to configure every cluster component through the local Etcd proxy.</p>
 
 <p>If you already have an Etcd cluster and wish to skip this step, ensure that you have set the <code>$ETCD_PEER</code> environment variable to your Etcd cluster before proceeding with the rest of this tutorial.</p>
 
 <h3 id="deploying-with-a-single-etcd-node">Deploying with a single Etcd node</h3>
 
-<p>Since we're only using a single Etcd node, there is no need to include a discovery token. There isn't any high availability for Etcd in this configuration, but that's assumed to be OK for development and testing. Boot this machine first so you can configure the rest with its IP address.</p>
+<p>Since we're only using a single Etcd node, there is no need to include a discovery token. There isn't any high availability for Etcd in this configuration, but that's assumed to be OK for development and testing. Provision this Droplet first so you can configure the rest with its IP address.</p>
 
-<p>Etcd is configurable through command-line flags and environment variables. To start Etcd automatically using custom settings with Systemd, we may store manually created partial Systemd unit drop-ins under: <code>/etc/systemd/system/etcd2.service.d/</code>. </p>
+<p>Etcd is configurable through command-line flags and environment variables. To start Etcd automatically using custom settings with Systemd, we may store manually created Systemd drop-ins under: <code>/etc/systemd/system/etcd2.service.d/</code>. Systemd drop-ins are a method for appending or overriding parameters of a Systemd unit without having to re-define the whole unit.</p>
 
 <p>Alternatively, we may use the <a href="https://github.com/coreos/coreos-cloudinit/blob/master/Documentation/cloud-config.md#etcd2" rel="nofollow"><code>coreos.etcd2.*</code></a> parameters in our <code>cloud-config</code> file to let CoreOS automatically generate the Etcd drop-ins on startup for us.</p>
 
@@ -558,9 +591,9 @@ coreos:
 
 <p>We set the <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/configuration.md#-listen-client-urls" rel="nofollow"><code>-listen-client-urls</code></a> flag to listen for client traffic and <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/configuration.md#-listen-peer-urls" rel="nofollow"><code>-listen-peer-urls</code></a> flag to listen for peer traffic coming from Etcd proxies running on other cluster nodes. We use the <code>$private_ipv4</code> substitution variable made available by the Digital Ocean <a href="https://www.digitalocean.com/community/tutorials/how-to-troubleshoot-common-issues-with-your-coreos-servers#checking-for-access-to-the-metadata-service" rel="nofollow">metadata service</a> in our <code>cloud-config</code> files. We use the <a href="http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml?search=etcd" rel="nofollow">IANA-assigned</a> Etcd ports <code>2379</code> for client traffic and <code>2380</code> for peer traffic.</p>
 
-<p><strong>Note</strong>: Several Etcd applications, such as <a href="https://github.com/skynetservices/skydns" rel="nofollow">SkyDNS</a>, still rely on Etcd's legacy port <code>4001</code>. We did not configure Etcd to listen on this port, but you may need to do this to support older Etcd applications in your infrastructure.<br></p>
+<p><span class="note"><strong>Note</strong>: Several Etcd applications, such as <a href="https://github.com/skynetservices/skydns" rel="nofollow">SkyDNS</a>, still rely on Etcd's legacy port <code>4001</code>. We did not configure Etcd to listen on this port, but you may need to do this to support older Etcd applications in your infrastructure.<br></span></p>
 
-<p>Our Etcd node will advertise itself with it's <code>private_ip</code> to clients as we define <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/configuration.md#-advertise-client-urls" rel="nofollow"><code>-advertise-client-urls</code></a> to overwrite the default of <code>localhost</code>. this is important to avoid loops for our <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/proxy.md" rel="nofollow">Etcd proxy</a> running on our worker nodes. We are also required to configure a <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/configuration.md#-name" rel="nofollow">name</a> for our Etcd instance to overwrite the default name for static bootstrapping. To bootstrap our single node Etcd cluster we directly provide the <code>initial</code> clustering flags <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/configuration.md#-initial-cluster" rel="nofollow"><code>-initial-cluster</code></a> and <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/configuration.md#-initial-advertise-peer-urls" rel="nofollow"><code>-initial-advertise-peer-urls</code></a> as we do not rely on cluster discovery. </p>
+<p>Our Etcd node will advertise itself with its <code>private_ip</code> to clients as we define <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/configuration.md#-advertise-client-urls" rel="nofollow"><code>-advertise-client-urls</code></a> to overwrite the default of <code>localhost</code>. this is important to avoid loops for our <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/proxy.md" rel="nofollow">Etcd proxy</a> running on our worker nodes. We are also required to configure a <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/configuration.md#-name" rel="nofollow">name</a> for our Etcd instance to overwrite the default name for static bootstrapping. To bootstrap our single node Etcd cluster we directly provide the <code>initial</code> clustering flags <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/configuration.md#-initial-cluster" rel="nofollow"><code>-initial-cluster</code></a> and <a href="https://github.com/coreos/etcd/blob/release-2.2/Documentation/configuration.md#-initial-advertise-peer-urls" rel="nofollow"><code>-initial-advertise-peer-urls</code></a> as we do not rely on cluster discovery. </p>
 
 <p>Next, we tell Systemd to start our Etcd service on boot by providing a unit definition for the <code>etcd2</code> service in the same <code>cloud-config</code> file as well and as this component is crucial and we only have a single node, we turn off the CoreOS <code>reboot-strategy</code> which is <code>on</code> by default.</p>
 
@@ -584,7 +617,7 @@ coreos:
 </li><li class="line" prefix="17">    group: alpha
 </li><li class="line" prefix="18">    reboot-strategy: off
 </li></ul></code></pre>
-<p><a href="https://coreos.com/validate" rel="nofollow">Validate</a> your cloud-config file, then create your <code>etcd-01</code> droplet with the following command. :</p>
+<p>Validate your cloud-config file with the <a href="https://coreos.com/validate" rel="nofollow">CoreOS Validator</a>, then create your <code>etcd-01</code> droplet with the following Doctl command. :</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">doctl d c --wait-for-active \
 </li><li class="line" prefix="$">    -i "CoreOS-alpha" \
 </li><li class="line" prefix="$">    -s 512mb \
@@ -593,7 +626,7 @@ coreos:
 </li><li class="line" prefix="$">    -k k8s-key \
 </li><li class="line" prefix="$">    -uf etcd-01.yaml etcd-01
 </li></ul></code></pre>
-<p>Again we are waiting for the droplet creation to be completed before proceeding. When ready, give the Droplet some time to start the SSH daemon, then connect::</p>
+<p>Again we are waiting for the droplet creation to be completed before proceeding. When active, give the Droplet some time to start the SSH daemon, then connect::</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">ssh core@`doctl d | grep etcd-01 | awk '{print $3}'`
 </li></ul></code></pre>
 <p>Confirm Etcd is running:</p>
@@ -604,7 +637,7 @@ coreos:
    Loaded: loaded (/usr/lib64/systemd/system/etcd2.service; disabled; vendor preset: disabled)
   Drop-In: /run/systemd/system/etcd2.service.d
            └─20-cloudinit.conf
-   Active: active (running) since Sat 2015-11-11 23:19:13 UTC; 6min ago
+   Active: <span class="highlight">active (running)</span> since Sat 2015-11-11 23:19:13 UTC; 6min ago
  Main PID: 841 (etcd2)
    CGroup: /system.slice/etcd2.service
            └─841 /usr/bin/etcd2
@@ -638,75 +671,103 @@ cluster is healthy
 <p>This should return output similar to:</p>
 <pre class="code-pre "><code langs=""><div class="secondary-code-label " title="Output">Output</div>http://10.129.69.201:2380
 </code></pre>
-<p>For our cluster nodes, Etcd will run in proxy mode pointing to our Etcd Droplet <code>private_ip</code>. The relevant part of the cluster nodes <code>cloud-config</code> for Etcd proxies will look like this:</p>
-<div class="code-label " title="cloud-config-*.yaml - cluster etcd proxy config snippet">cloud-config-*.yaml - cluster etcd proxy config snippet</div><pre class="code-pre "><code langs="">...
-  etcd2:
-    proxy: on 
-    listen-client-urls: http://localhost:2379
-    initial-cluster: "etcd-01=ETCD_PEER"
-  units:
-    - name: "etcd2.service"
-      command: "start"
-...
-</code></pre>
-<p>Where we will script the substitution of the <code>ETCD_PEER</code> placeholder with the following <code>sed</code> command, prior to creating the Droplets:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">sed -i -e "s|ETCD_PEER|${ETCD_PEER}|g;" cloud-config-*.yaml
+<p>We will point our other Droplets to this Etcd cluster through their <code>cloud-config</code> files. Start by creating a new file in your working directory named <code>cloud-config-controller.yaml</code>. This will be the template for our Controller Droplets, add the Etcd proxy configuration with the placeholder for ETCD_PEER (we will replace the placeholder at a later stage). We will keep adding snippets of configuration to this file as we go through each step in this tutorial. We will provide a full listing of the final file as part of this tutorial. Add the Etcd proxy configuration to the file now:</p>
+<div class="code-label " title="cloud-config-controller.yaml">cloud-config-controller.yaml</div><pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="1">#cloud-config
+</li><li class="line" prefix="2">
+</li><li class="line" prefix="3">coreos:
+</li><li class="line" prefix="4">  etcd2:
+</li><li class="line" prefix="5">    <span class="highlight">proxy: on </span>
+</li><li class="line" prefix="6">    listen-client-urls: http://localhost:2379
+</li><li class="line" prefix="7">    initial-cluster: "etcd-01=<span class="highlight">ETCD_PEER</span>"
+</li><li class="line" prefix="8">  units:
+</li><li class="line" prefix="9">    - name: "etcd2.service"
+</li><li class="line" prefix="10">      command: "start"
 </li></ul></code></pre>
-<p><strong>Note</strong>: Because our variable value includes forward slashes, we are using <code>sed</code> with the pipeline "|" character as separator for the "s" command instead of the more common forward slash. Whichever character follows the "s" command is used as the separator by <code>sed</code>.<br></p>
+<p>When we provision a cluster, we will script the substitution of the <code>ETCD_PEER</code> placeholder with a <code>sed</code> command similar to the one below:</p>
+<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">sed -e "s|ETCD_PEER|${ETCD_PEER}|g;" cloud-config-controller.yaml &gt; kube-controller-01.yaml
+</li></ul></code></pre>
 
-<p>We will proceed with reviewing the networking requirements for Kubernetes and how we achieve them on Digital Ocean in the next section.</p>
+<p><span class="note"><strong>Note</strong>: Because our variable value includes forward slashes, we are using <code>sed</code> with the pipeline "|" character as separator for the "s" command instead of the more common forward slash. Whichever character follows the "s" command is used as the separator by <code>sed</code>.<br></span></p>
 
-<h2 id="step-3-—-configuring-the-network-fabric-layer">Step 3 — Configuring The Network Fabric Layer.</h2>
+<p>We will proceed with reviewing the networking requirements for Kubernetes and how we achieve them on Digital Ocean in the next step.</p>
+
+<h2 id="step-4-—-configuring-the-network-fabric-layer">Step 4 — Configuring The Network Fabric Layer.</h2>
 
 <p>As explained in the introduction of this tutorial, Kubernetes has the fundamental networking requirement of ensuring that all containers are routable without network translation or port brokering on the hosts. In other words, this means every Droplet is required to have its own IP range within the cluster. To achieve this on Digital Ocean, Flannel will be used to provide an overlay network across multiple Droplets and configure Docker to use this networking layer for its containers.  </p>
 
 <p>Flannel runs an agent, <code>flanneld</code>, on each host which is responsible for allocating a subnet lease out of a pre-configured address space. When enabling Flannel on CoreOS, <a href="https://coreos.com/flannel/docs/latest/flannel-config.html#under-the-hood" rel="nofollow">CoreOS will ensure</a> Docker is automatically configured to use the Flannel overlay network for its containers. </p>
 
-<p>Flannel uses Etcd to store the network configuration, allocated subnets, and auxiliary data (such as host's IP). The Etcd storage back end for Flannel may be ran separately in the cluster. To reduce the complexity in this tutorial however, we will configure Flannel to share the external Etcd cluster with Kubernetes which is acceptable for Testing and Development only. By default, Flannel looks up its configuration under the <code>/coreos.com/network/config</code> key within Etcd. To run Flannel on each node in a consistent way, we are required to publish the Flannel configuration to Etcd under this key.</p>
+<p>Flannel uses Etcd to store the network configuration, subnets allocated to each host and auxiliary data (such as host IPs). The Etcd storage back end for Flannel should be ran separately from the Kubernetes storage back end. To reduce the complexity in this tutorial however, we will configure Flannel to share the external Etcd cluster with Kubernetes, this is acceptable for Testing and Development only. By default, Flannel looks up its configuration under the <code>/coreos.com/network/config</code> key within Etcd. To run Flannel on each node in a consistent way, we are required to publish the Flannel configuration to Etcd under this key.</p>
 
 <p>At the bare minimum, the configuration must provide Flannel an IP range (subnet) that it should use for the overlay network. The IP subnet used by Flannel should not overlap with the public and private IP ranges used by the Digital Ocean Droplets, <code>10.2.0.0/16</code> is the IP range used in this tutorial. This /16 range will be assigned for the entire overlay network and used by containers and Pods across the cluster Droplets. By default, Flannel will allocate a /24 to each Droplet. This default, along with the minimum and maximum subnet IP addresses is <a href="https://coreos.com/flannel/docs/latest/flannel-config.html#publishing-config-to-etcd" rel="nofollow">overridable in config</a>.</p>
 
 <p>The forwarding of packets by Flannel is achieved using one of several strategies that are known as back ends. In this tutorial we will configure Flannel to use the <code>vxlan</code> back end which is built on the performant in-kernel VXLAN tunneling protocol to encapsulate the packets for the overlay network.</p>
 
 <p>If we were to use the <a href="https://github.com/coreos/etcd/tree/master/etcdctl" rel="nofollow"><code>etcdctl</code></a> utility, which is shipped with CoreOS, directly from the terminal of any of our Droplets to publish this configuration, it would look like this:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">etcdctl set /coreos.com/network/config '{"Network":"10.2.0.0/16", "Backend": {"Type": "vxlan"}}
+<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">etcdctl set /coreos.com/network/config '{"Network":"<span class="highlight">10.2.0.0/16</span>", "Backend": {"Type": "<span class="highlight">vxlan</span>"}}
 </li></ul></code></pre>
-<p>With the above command, <code>etcdctl</code> uses the localhost, which in our hosts will be an Etcd daemon running in proxy mode forwarding the configuration to our Etcd cluster.</p>
+<p>With the above command, <code>etcdctl</code> uses the localhost, which in our hosts will be the Etcd daemon running in proxy mode, forwarding the configuration to our Etcd storage back end. </p>
 
-<p>To facilitate the cluster bootstrap, we will put this command into a drop-in for the <code>flanneld.service</code> as part of our Kubernetes controller's <code>cloud-config</code>. You can create this <code>cloud-config-controller.yaml</code> file and add the snippets as we go through them in this tutorial, however we will re-order the snippets in the final file and provide a full listing of the file as part of this tutorial.</p>
-<div class="code-label " title="cloud-config-controller.yaml - flannel drop-in snippet">cloud-config-controller.yaml - flannel drop-in snippet</div><pre class="code-pre "><code langs="">...
-  units:
-    - name: flanneld.service
-      command: start
-      drop-ins:
-        - name: 50-network-config.conf
-          content: |
-            [Unit]
-            Requires=etcd2.service
-            [Service]
-            ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.2.0.0/16", "Backend": {"Type": "vxlan"}}'
-...
-</code></pre>
-<p><strong>Note</strong>: any services that run Docker containers must come after the <code>flanneld.service</code> and should include <code>Requires=flanneld.service</code>, <code>After=flanneld.service</code>, and <code>Restart=always|on-failure</code> directives. These directives are necessary because <code>flanneld.service</code> may fail due to Etcd not being available yet. It will keep restarting and it is important for Docker based services to also keep trying until Flannel is up.<br></p>
+<p>In our <code>cloud-config-controller.yaml</code> we now add the requirement that the <code>flanneld.service</code> needs to be started as well as add a Systemd drop-in. In this case we're using the Systemd drop-in to append a pre-condition to the start command of the <code>flanneld</code> service, making sure the Flannel configuration is published prior to starting Flannel:</p>
+<div class="code-label " title="cloud-config-controller.yaml">cloud-config-controller.yaml</div><pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="1">#cloud-config
+</li><li class="line" prefix="2">
+</li><li class="line" prefix="3">coreos:
+</li><li class="line" prefix="4">  etcd2:
+</li><li class="line" prefix="5">    proxy: on 
+</li><li class="line" prefix="6">    listen-client-urls: http://localhost:2379
+</li><li class="line" prefix="7">    initial-cluster: "etcd-01=ETCD_PEER"
+</li><li class="line" prefix="8">  units:
+</li><li class="line" prefix="9">    - name: "etcd2.service"
+</li><li class="line" prefix="10">      command: "start"
+</li><li class="line" prefix="11">    - name: "<span class="highlight">flanneld.service</span>"
+</li><li class="line" prefix="12">      command: <span class="highlight">start</span>
+</li><li class="line" prefix="13">      <span class="highlight">drop-ins</span>:
+</li><li class="line" prefix="14">        - name: 50-network-config.conf
+</li><li class="line" prefix="15">          content: |
+</li><li class="line" prefix="16">            [Unit]
+</li><li class="line" prefix="17">            Requires=etcd2.service
+</li><li class="line" prefix="18">            [Service]
+</li><li class="line" prefix="19">            <span class="highlight">ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.2.0.0/16", "Backend": {"Type": "vxlan"}}'</span>
+</li></ul></code></pre>
 
-<p>In order for Flannel to manage the pod network in the cluster, Docker needs to be configured to use it. All we need to do is require that <code>flanneld</code> is running prior to Docker starting.</p>
+<p><span class="note"><strong>Note</strong>: any services that run Docker containers must come after the <code>flanneld.service</code> definition in our <code>cloud-config</code> file and should include <code>Requires=flanneld.service</code>, <code>After=flanneld.service</code>, and <code>Restart=always|on-failure</code> directives. These directives are necessary because <code>flanneld.service</code> may fail due to Etcd not being available yet. Flannel will keep restarting and it is important for Docker based services to also keep trying until Flannel is up.<br></span></p>
 
-<p>We're going to do this with a Systemd drop-in, which is a method for appending or overriding parameters of a Systemd unit. In this case we're appending two dependency rules:</p>
-<div class="code-label " title="cloud-config-controller - docker config snippet">cloud-config-controller - docker config snippet</div><pre class="code-pre "><code langs="">...
-  units:
-    - name: docker.service
-      command: start
-      drop-ins:
-        - name: 40-flannel.conf
-          content: |
-            [Unit]
-            Requires=flanneld.service
-            After=flanneld.service
-...
-</code></pre>
-<h2 id="step-4-—-understanding-where-to-get-the-kubernetes-artifacts">Step 4 — Understanding Where To Get The Kubernetes Artifacts</h2>
+<p>In order for Flannel to manage the pod network in the cluster, Docker needs to be configured to use the correct ip range for the Docker bridge. All we need to do is require that <code>flanneld</code> is running prior to Docker starting and Flannel will handle the Docker configuration for us.</p>
 
-<p>At the time of writing, the <a href="http://kubernetes.io/v1.1/docs/getting-started-guides/scratch.html#downloading-and-extracting-kubernetes-binaries" rel="nofollow">Official</a> guidelines require the Kubernetes binaries and Docker images wrapping those binaries to be downloaded as part of the full Kubernetes release archive located under the <a href="https://github.com/kubernetes/kubernetes/releases" rel="nofollow">Kubernetes</a> repository on GitHub.</p>
+<p>We're doing this with another Systemd drop-in, in this case we're appending two dependency rules to our Docker service to ensure it is only started after the Flannel service:</p>
+<div class="code-label " title="cloud-config-controller.yaml">cloud-config-controller.yaml</div><pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="1">#cloud-config
+</li><li class="line" prefix="2">
+</li><li class="line" prefix="3">coreos:
+</li><li class="line" prefix="4">  etcd2:
+</li><li class="line" prefix="5">    proxy: on 
+</li><li class="line" prefix="6">    listen-client-urls: http://localhost:2379
+</li><li class="line" prefix="7">    initial-cluster: "etcd-01=ETCD_PEER"
+</li><li class="line" prefix="8">  units:
+</li><li class="line" prefix="9">    - name: "etcd2.service"
+</li><li class="line" prefix="10">      command: "start"
+</li><li class="line" prefix="11">    - name: "flanneld.service"
+</li><li class="line" prefix="12">      command: start
+</li><li class="line" prefix="13">      drop-ins:
+</li><li class="line" prefix="14">        - name: 50-network-config.conf
+</li><li class="line" prefix="15">          content: |
+</li><li class="line" prefix="16">            [Unit]
+</li><li class="line" prefix="17">            Requires=etcd2.service
+</li><li class="line" prefix="18">            [Service]
+</li><li class="line" prefix="19">            ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.2.0.0/16", "Backend": {"Type": "vxlan"}}'
+</li><li class="line" prefix="20">    - name: "<span class="highlight">docker.service</span>"
+</li><li class="line" prefix="21">      command: start
+</li><li class="line" prefix="22">      <span class="highlight">drop-ins</span>:
+</li><li class="line" prefix="23">        - name: 40-flannel.conf
+</li><li class="line" prefix="24">          content: |
+</li><li class="line" prefix="25">            [Unit]
+</li><li class="line" prefix="26">            <span class="highlight">Requires=flanneld.service</span>
+</li><li class="line" prefix="27">            <span class="highlight">After=flanneld.service</span>
+</li></ul></code></pre>
+<h2 id="step-5-—-downloading-the-kubernetes-artifacts">Step 5 — Downloading The Kubernetes Artifacts</h2>
+
+<h3 id="overview-of-the-kubernetes-artifacts">Overview of the Kubernetes Artifacts</h3>
+
+<p>At the time of writing, the <a href="http://kubernetes.io/v1.1/docs/getting-started-guides/scratch.html#downloading-and-extracting-kubernetes-binaries" rel="nofollow">Official Kubernetes guidelines</a> require the Kubernetes binaries and Docker images wrapping those binaries to be downloaded as part of the full Kubernetes release archive available in the <a href="https://github.com/kubernetes/kubernetes/releases" rel="nofollow">Kubernetes</a> repository on GitHub.</p>
 
 <p>At the same time, all Kubernetes artifacts are also stored on the <code>kubernetes-release</code> bucket on Google cloud storage for every release.</p>
 
@@ -715,13 +776,13 @@ cluster is healthy
 </li></ul></code></pre>
 <p>This returned v1.1.2 at the time of writing.</p>
 
-<p>To list all Kubernetes release binaries stored in the Google cloud storage bucket for a particular release, you can either use the python 2.7 based <a href="https://cloud.google.com/storage/docs/gsutil" rel="nofollow">Gsutil</a> from the Google SDK as follows:</p>
+<p>To list all Kubernetes release binaries stored in the Google cloud storage bucket for a particular release, you can either use the python 2.7 based <a href="https://cloud.google.com/storage/docs/gsutil" rel="nofollow">Gsutil from the Google SDK</a> as follows:</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">gsutil ls -R gs://kubernetes-release/release/v1.1.2/bin/linux/amd64
 </li></ul></code></pre>
 <p>Or without Python, directly talking to the <a href="https://cloud.google.com/storage/docs/json_api/v1/buckets/list" rel="nofollow">Google cloud platform API</a> using <code>curl</code> &amp; <code>jq</code> (<a href="https://stedolan.github.io/jq/manual/" rel="nofollow">Jq ref</a>):</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$"> curl -sL  https://www.googleapis.com/storage/v1/b/kubernetes-release/o?prefix='release/v1.1.2/bin/linux/amd64' | jq '"https://storage.googleapis.com/kubernetes-release/\(.items[].name)"'
 </li></ul></code></pre>
-<p>A combined binary is provided as the <a href="https://releases.k8s.io/release-1.1/cmd/hyperkube" rel="nofollow">Hyperkube</a>. This Hyperkube is an all-in-one binary, allowing you to run any Kubernetes component as a subcommand of the <code>hyperkube</code> command. The Hyperkube is also made available within a Docker image. The Dockerfile of this container can be reviewed <a href="https://github.com/kubernetes/kubernetes/blob/release-1.1/cluster/images/hyperkube/Dockerfile" rel="nofollow">here</a>.</p>
+<p>A combined binary is provided as the <a href="https://releases.k8s.io/release-1.1/cmd/hyperkube" rel="nofollow">Hyperkube</a>. This Hyperkube is an all-in-one binary, allowing you to run any Kubernetes component as a subcommand of the <code>hyperkube</code> command. The Hyperkube is also made available within a Docker image. The Dockerfile used to build this image <a href="https://github.com/kubernetes/kubernetes/blob/release-1.1/cluster/images/hyperkube/Dockerfile" rel="nofollow">can be reviewed here</a>.</p>
 
 <p>The plan for the Kubernetes release process is to publish the Kubernetes images on the Google Container Registry, under the <code>google_containers</code> repository: <code>gcr.io/google_containers/hyperkube:$TAG</code>, where TAG is the latest stable release tag (i.e.: <code>v1.1.2</code>). </p>
 
@@ -734,7 +795,7 @@ cluster is healthy
 <p>Moreover, as the Hyperkube combines all binaries, is based on <code>debian:jessie</code> and includes additional packages such <code>iptables</code> (required by the <code>kube-proxy</code>), its size is considerable:</p>
 <pre class="code-pre "><code langs=""><div class="secondary-code-label " title="Output">Output</div>gcr.io/google_containers/hyperkube    v1.1.2    aa1283b0c02d    2 weeks ago    254.3 MB
 </code></pre>
-<p>As a result, for this tutorial, we will run the <code>kube-proxy</code> binary outside of a container, the same way we run the <code>kubelet</code> or any system daemon. For the <code>kube-apiserver</code>, <code>kube-controller-manager</code> and <code>kube-scheduler</code> it is recommended to run these as containers and we will take a closer look at the available Docker images now.</p>
+<p>As a result, for this tutorial, we will run the <code>kube-proxy</code> binary outside of a container, the same way we run the <code>kubelet</code> or any system daemon. For the <code>kube-apiserver</code>, <code>kube-controller-manager</code> and <code>kube-scheduler</code> it is recommended to run these within containers and we will take a closer look at the available Docker images to do so now.</p>
 
 <p>As can be seen in the listings earlier, tarred repositories for Docker images wrapping the Kubernetes binaries are also available:</p>
 
@@ -768,80 +829,187 @@ cluster is healthy
 </li></ul></code></pre>
 <p>We have loaded the <code>kube-apiserver</code> image in this example.</p>
 
-<p>The Kubernetes build script tags these images as <code>gcr.io/google_containers/$binary_name:$md5_sum</code>. To easily run a container from this image, or push the image to a private registry for bootstrapping, we may re-tag the images with the following commands:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">#get md5 via docker_tag
+<p>The Kubernetes build script tags these images as <code>gcr.io/google_containers/$binary_name:<span class="highlight">$md5_sum</span></code>, which uses the md5_sum instead of the version. To easily run a container from this image, or push the image to a private registry for bootstrapping, we may re-tag the images with commands similar to the following:</p>
+<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$"><span class="highlight">#get md5 via docker_tag</span>
 </li><li class="line" prefix="$">docker_tag="$(curl -sL https://storage.googleapis.com/kubernetes-release/release/v1.1.2/bin/linux/amd64/kube-apiserver.docker_tag)"
-</li><li class="line" prefix="$">#re-tag
+</li><li class="line" prefix="$"><span class="highlight">#re-tag</span>
 </li><li class="line" prefix="$">docker tag -f "gcr.io/google_containers/kube-apiserver:${docker_tag}" "kube-apiserver:1.1.2"
 </li></ul></code></pre>
-<p>In the above command we first get the md5_sum from the cloud storage bucket and use it to re-tag the image.</p>
+<p>In the above command we first get the md5_sum from the cloud storage bucket and use it to re-tag the image. We can automate this for all the Kubernetes containers and will do this to pre-load the Kubernetes images.</p>
 
-<p>&lt;!-- do we really need to mention the Kuar images? They are mentioned in every Workshop from Kelsey and used a lot... may be just to clarify they are not official and their presence is not guaranteed.. --&gt;</p>
+<h3 id="pre-loading-kubernetes-images">Pre-Loading Kubernetes images</h3>
 
-<p><strong>A note about the Kubernetes Up and Running images</strong>:</p>
+<p>We will <code>curl</code> and <code>load</code> each image individually, see <a href="http://kubernetes.io/v1.1/docs/user-guide/images.html#pre-pulling-images" rel="nofollow">Pre-pulling images</a> for details on how pre-pulled images may affect the Kubelet Pod definitions if we were to use the <code>latest</code> tag. The following script combines the commands described above for each binary:</p>
+<div class="code-label " title="pull-kube-images.sh">pull-kube-images.sh</div><pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="1">#!/bin/bash
+</li><li class="line" prefix="2">tag=1.1.2
+</li><li class="line" prefix="3">docker_wrapped_binaries=(
+</li><li class="line" prefix="4">   "kube-apiserver"
+</li><li class="line" prefix="5">   "kube-controller-manager"
+</li><li class="line" prefix="6">   "kube-scheduler"
+</li><li class="line" prefix="7">   #"kube-proxy"
+</li><li class="line" prefix="8">)
+</li><li class="line" prefix="9">temp_dir="$(mktemp -d -t 'kube-server-XXXX')"
+</li><li class="line" prefix="10">
+</li><li class="line" prefix="11">for binary in "${docker_wrapped_binaries[@]}"; do
+</li><li class="line" prefix="12">  docker_tag="$(curl -sL https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.docker_tag)"
+</li><li class="line" prefix="13">  echo "downloading ${binary} ${docker_tag}"
+</li><li class="line" prefix="14">  curl -Lo ${temp_dir}/${binary}.tar https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.tar
+</li><li class="line" prefix="15">  echo "loading docker image"
+</li><li class="line" prefix="16">  docker load -i ${temp_dir}/${binary}.tar
+</li><li class="line" prefix="17">  echo "tagging docker image as ${binary} ${tag}"
+</li><li class="line" prefix="18">  docker tag -f "gcr.io/google_containers/${binary}:${docker_tag}" "${binary}:${tag}"
+</li><li class="line" prefix="19">done
+</li><li class="line" prefix="20">
+</li><li class="line" prefix="21">echo "cleaning up temp dir"
+</li><li class="line" prefix="22">rm -rf "${temp_dir}"
+</li></ul></code></pre>
+<p>The build scripts provided on the Kubernetes repository were used as a reference to create this script.</p>
 
-<p>Non-official images are also made available by Kelsey Hightower for his Kubernetes Up And Running book through his <code>kuar</code> repository (backed by the Kubernetes Up And Running <a href="https://cloud.google.com/container-registry/docs/#using_an_existing_google_cloud_storage_bucket" rel="nofollow">Google cloud storage bucket</a>), we may list the contents of that bucket using the <code>repositories/library</code> key, as follows:</p>
+<p>If you have a Docker registry available, you may modify this script to push these images to a repository there and simplify the provisioning of your cluster nodes significantly. In that case, our cluster nodes know how to simply pull the containers from your repository and we do not need to include the above script as part of our controller Droplet configuration. For this tutorial, we assume such registry is not available and we will embed the above script into the <code>cloud-config</code> file of every controller node.</p>
+
+<p>&lt;!-- Ideally a version of this tutorial is created which uses a bootstrapping droplet running the Etcd discovery service, a TLS secured Docker registry and Ansible to provision TLS secrets for every node... --&gt;</p>
+
+<p>Insert this script to the <code>cloud-config-controller.yaml</code> with a <code>write-files</code> directive and make it executable. To reduce the output to the Systemd journal, we make the curl command silent and strip the <code>echo</code> commands. We inserted the <code>write-files</code> directive before the CoreOS configuration directives for clarity. We will execute the script through a <code>oneshot</code> service, which we will add to the <code>cloud-config</code> after this code listing:</p>
+<div class="code-label " title="cloud-config-controller.yaml">cloud-config-controller.yaml</div><pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="1">#cloud-config
+</li><li class="line" prefix="2">
+</li><li class="line" prefix="3"><span class="highlight">write-files:</span>
+</li><li class="line" prefix="4">  - path: <span class="highlight">/opt/bin/pull-kube-images.sh</span>
+</li><li class="line" prefix="5">    permissions: '<span class="highlight">0755</span>'
+</li><li class="line" prefix="6">    content: |
+</li><li class="line" prefix="7">      #!/bin/bash
+</li><li class="line" prefix="8">      tag=1.1.2
+</li><li class="line" prefix="9">      docker_wrapped_binaries=(
+</li><li class="line" prefix="10">        "kube-apiserver"
+</li><li class="line" prefix="11">        "kube-controller-manager"
+</li><li class="line" prefix="12">        "kube-scheduler"
+</li><li class="line" prefix="13">      )
+</li><li class="line" prefix="14">      temp_dir="$(mktemp -d -t 'kube-server-XXXX')"
+</li><li class="line" prefix="15">      for binary in "${docker_wrapped_binaries[@]}"; do
+</li><li class="line" prefix="16">        docker_tag="$(curl -<span class="highlight">s</span>L https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.docker_tag)"
+</li><li class="line" prefix="17">        curl -sLo ${temp_dir}/${binary}.tar https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.tar
+</li><li class="line" prefix="18">        docker load -i ${temp_dir}/${binary}.tar
+</li><li class="line" prefix="19">        docker tag -f "gcr.io/google_containers/${binary}:${docker_tag}" "${binary}:${tag}"
+</li><li class="line" prefix="20">      done;
+</li><li class="line" prefix="21">      rm -rf "${temp_dir}";
+</li><li class="line" prefix="22">      exit $?
+</li><li class="line" prefix="23">coreos:
+</li><li class="line" prefix="24">  etcd2:
+</li><li class="line" prefix="25">    proxy: on 
+</li><li class="line" prefix="26">    listen-client-urls: http://localhost:2379
+</li><li class="line" prefix="27">    initial-cluster: "etcd-01=ETCD_PEER"
+</li><li class="line" prefix="28">  units:
+</li><li class="line" prefix="29">    - name: "etcd2.service"
+</li><li class="line" prefix="30">      command: "start"
+</li><li class="line" prefix="31">    - name: "flanneld.service"
+</li><li class="line" prefix="32">      command: start
+</li><li class="line" prefix="33">      drop-ins:
+</li><li class="line" prefix="34">        - name: 50-network-config.conf
+</li><li class="line" prefix="35">          content: |
+</li><li class="line" prefix="36">            [Unit]
+</li><li class="line" prefix="37">            Requires=etcd2.service
+</li><li class="line" prefix="38">            [Service]
+</li><li class="line" prefix="39">            ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.2.0.0/16", "Backend": {"Type": "vxlan"}}'
+</li><li class="line" prefix="40">    - name: "docker.service"
+</li><li class="line" prefix="41">      command: start
+</li><li class="line" prefix="42">      drop-ins:
+</li><li class="line" prefix="43">        - name: 40-flannel.conf
+</li><li class="line" prefix="44">          content: |
+</li><li class="line" prefix="45">            [Unit]
+</li><li class="line" prefix="46">            Requires=flanneld.service
+</li><li class="line" prefix="47">            After=flanneld.service
+</li></ul></code></pre>
+<p>We will now instruct <code>cloudinit</code> to run this script during initiation of the Droplet by adding a <code>oneshot</code> service for it to our <code>cloud-config</code>. Systemd will flag services which exit as <code>failed</code>, unless we explicitly inform Systemd our service should still be flagged as successful after a non-zero exit with the <code>RemainAfterExit</code> flag. The script also requires the network and Docker services to be available and we add these as conditions to our Service Unit. Add the Unit definition to the end of the <code>cloud-config-controller.yaml</code> file (line 48 and below):</p>
+<div class="code-label " title="cloud-config-controller.yaml">cloud-config-controller.yaml</div><pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="1">#cloud-config
+</li><li class="line" prefix="2">
+</li><li class="line" prefix="3">write-files:
+</li><li class="line" prefix="4">  - path: /opt/bin/pull-kube-images.sh
+</li><li class="line" prefix="5">    permissions: '0755'
+</li><li class="line" prefix="6">    content: |
+</li><li class="line" prefix="7">      #!/bin/bash
+</li><li class="line" prefix="8">      tag=1.1.2
+</li><li class="line" prefix="9">      docker_wrapped_binaries=(
+</li><li class="line" prefix="10">        "kube-apiserver"
+</li><li class="line" prefix="11">        "kube-controller-manager"
+</li><li class="line" prefix="12">        "kube-scheduler"
+</li><li class="line" prefix="13">      )
+</li><li class="line" prefix="14">      temp_dir="$(mktemp -d -t 'kube-server-XXXX')"
+</li><li class="line" prefix="15">      for binary in "${docker_wrapped_binaries[@]}"; do
+</li><li class="line" prefix="16">        docker_tag="$(curl -sL https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.docker_tag)"
+</li><li class="line" prefix="17">        curl -sLo ${temp_dir}/${binary}.tar https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.tar
+</li><li class="line" prefix="18">        docker load -i ${temp_dir}/${binary}.tar
+</li><li class="line" prefix="19">        docker tag -f "gcr.io/google_containers/${binary}:${docker_tag}" "${binary}:${tag}"
+</li><li class="line" prefix="20">      done;
+</li><li class="line" prefix="21">      rm -rf "${temp_dir}";
+</li><li class="line" prefix="22">      exit $?
+</li><li class="line" prefix="23">coreos:
+</li><li class="line" prefix="24">  etcd2:
+</li><li class="line" prefix="25">    proxy: on 
+</li><li class="line" prefix="26">    listen-client-urls: http://localhost:2379
+</li><li class="line" prefix="27">    initial-cluster: "etcd-01=ETCD_PEER"
+</li><li class="line" prefix="28">  units:
+</li><li class="line" prefix="29">    - name: "etcd2.service"
+</li><li class="line" prefix="30">      command: "start"
+</li><li class="line" prefix="31">    - name: "flanneld.service"
+</li><li class="line" prefix="32">      command: start
+</li><li class="line" prefix="33">      drop-ins:
+</li><li class="line" prefix="34">        - name: 50-network-config.conf
+</li><li class="line" prefix="35">          content: |
+</li><li class="line" prefix="36">            [Unit]
+</li><li class="line" prefix="37">            Requires=etcd2.service
+</li><li class="line" prefix="38">            [Service]
+</li><li class="line" prefix="39">            ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.2.0.0/16", "Backend": {"Type": "vxlan"}}'
+</li><li class="line" prefix="40">    - name: "docker.service"
+</li><li class="line" prefix="41">      command: start
+</li><li class="line" prefix="42">      drop-ins:
+</li><li class="line" prefix="43">        - name: 40-flannel.conf
+</li><li class="line" prefix="44">          content: |
+</li><li class="line" prefix="45">            [Unit]
+</li><li class="line" prefix="46">            Requires=flanneld.service
+</li><li class="line" prefix="47">            After=flanneld.service
+</li><li class="line" prefix="48">    - name: "<span class="highlight">pull-kube-images.service</span>"
+</li><li class="line" prefix="49">      command: <span class="highlight">start</span>
+</li><li class="line" prefix="50">      content: |
+</li><li class="line" prefix="51">        [Unit]
+</li><li class="line" prefix="52">        Description=Pull and load all Docker wrapped Kubernetes binaries
+</li><li class="line" prefix="53">        Documentation=https://github.com/kubernetes/kubernetes
+</li><li class="line" prefix="54">        <span class="highlight">Requires=network-online.target docker.service</span>
+</li><li class="line" prefix="55">        <span class="highlight">After=network-online.target docker.service</span>
+</li><li class="line" prefix="56">        [Service]
+</li><li class="line" prefix="57">        ExecStart=/opt/bin/pull-kube-images.sh
+</li><li class="line" prefix="58">        <span class="highlight">RemainAfterExit=yes</span>
+</li><li class="line" prefix="59">        Type=oneshot
+</li></ul></code></pre>
+<h3 id="a-note-about-the-kubernetes-up-and-running-images">A note about the Kubernetes Up and Running images:</h3>
+
+<p>&lt;!-- do we really need to mention the Kuar images? I believe so as they are mentioned in every Workshop from Kelsey and used a lot... may be just to clarify they are not official and their presence is not guaranteed.. --&gt;</p>
+
+<p>Non-official images are also made available by Kelsey Hightower for his Kubernetes Up And Running book through his <code>kuar</code> repository (backed by the Kubernetes Up And Running <a href="https://cloud.google.com/container-registry/docs/#using_an_existing_google_cloud_storage_bucket" rel="nofollow">Google cloud storage bucket</a>), we may list the contents of the kuar bucket using the <code>repositories/library</code> key to find the images available within the repository, as follows:</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">gsutil ls gs://kuar/repositories/library/
 </li></ul></code></pre>
 <p>Or without Python, using <code>curl</code>, <code>jq</code> and <code>grep</code> to grab all v1.1.2 Kubernetes tagged images:</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">curl -sL  https://www.googleapis.com/storage/v1/b/kuar/o?prefix='repositories/library/kube' | jq .items[].name | grep tag_1.1.2
 </li></ul></code></pre>
-<p>The <code>kuar</code> images are more easily ran with a single Docker command using the registry endpoint: <code>b.gcr.io/kuar/$binary_name:$version</code>, for example: to run the <code>kube-apiserver</code>:</p>
+<p>The <code>kuar</code> images are very easy to use with a single Docker command using the registry endpoint: <code>b.gcr.io/kuar/$binary_name:$version</code>, for example: to run the <code>kube-apiserver</code>:</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">docker run b.gcr.io/kuar/kube-apiserver:1.1.2
 </li></ul></code></pre>
-<p>This is much easier than manually <code>curl</code>-ing, <code>load</code>-ing, re-<code>tag</code>-ing and <code>run</code>-ing the images, but keep in mind that these are not the official Kubernetes images and their availability is not guaranteed.</p>
+<p>This is much easier than manually <code>curl</code>-ing, <code>load</code>-ing, re-<code>tag</code>-ing and <code>run</code>-ing the images, but keep in mind that these are not the official Kubernetes images and their availability is not guaranteed. We will not be using these images as part of this tutorial.</p>
 
-<h2 id="step-5-—-initializing-the-kubernetes-cluster-pki">Step 5 — Initializing The Kubernetes Cluster PKI</h2>
+<h2 id="step-6-—-the-kubernetes-controller-systemd-services">Step 6 — The Kubernetes Controller Systemd Services</h2>
 
-<p>In this step we will initialize the root Certificate Authority used by our Cluster.</p>
-
-<p>In this tutorial we will configure the Kubernetes API Server to use client certificate authentication to enable encryption and prevent traffic interception and man-in-the-middle attacks. This means it is necessary to have a Certificate Authority (CA) which will be trusted as the root authority for the cluster and use it to generate the proper credentials. The necessary assets can also be generated from an existing Public Key Infrastructure (PKI), if already available.</p>
-
-<p>For this tutorial we will use Self-Signed certificates. Every certificate is created by submitting Certificate Signing Requests (CSRs) to a CA. A CSR contains information identifying whom the certificate request is for, including the public key associated with the private key of the requesting party. The CA will sign the CSR, effectively returning what is from then on referred to as "the certificate".</p>
-
-<p>For a detailed overview of OpenSSL, refer to the <a href="https://www.digitalocean.com/community/tutorials/openssl-essentials-working-with-ssl-certificates-private-keys-and-csrs" rel="nofollow">OpenSSL Essentials guide</a> on Digital Ocean.</p>
-
-<h3 id="initialize-cluster-root-ca">Initialize Cluster Root CA</h3>
-
-<p>Generate the private key for your root certificate into the default <code>$HOME/.kube</code> folder, which we should have created as part of our client machine setup, with the following OpenSSL command to generate a 2048 bit RSA private key:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">openssl genrsa -out ~/.kube/ca-key.pem 2048
-</li></ul></code></pre>
-<p>This <code>ca-key.pem</code> private key will be used to generate the self-signed <code>ca.pem</code> certificate which will be trusted by all your Kubernetes components, as well as every Worker node and Administrator key pair. This key needs to be closely guarded and kept in a secure location for future use. </p>
-
-<p>Next, use the private key to generate the self-signed root <code>ca.pem</code> certificate with the following openssl command:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">openssl req -x509 -new -nodes -key ~/.kube/ca-key.pem -days 10000 -out ~/.kube/ca.pem -subj "/CN=kube-ca"
-</li></ul></code></pre>
-<p>The <code>ca.pem</code> certificate will be used as the root certificate to verify the authenticity of certificates by every component within your Kubernetes cluster, you will copy this file to the controller and worker Droplets as well as the Administrator clients.</p>
-
-<p>Confirm your Root CA assets exist in the expected location:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">ls -1 ~/.kube/ca*.pem
-</li></ul></code></pre>
-<p>Output similar to:</p>
-<pre class="code-pre "><code langs=""><div class="secondary-code-label " title="Output">Output</div>/home/demo/.kube/ca.pem  
-/home/demo/.kube/ca-key.pem
-</code></pre>
-<p>We now have all the necessary ingredients to generate certificates for all of our cluster components. We will come back to <code>openssl</code> to generate each as required.</p>
-
-<h2 id="step-6-—-provisioning-the-kubernetes-controller-droplets">Step 6 — Provisioning The Kubernetes Controller Droplets</h2>
-
-<p>In this step we will create a single Kubernetes controller Droplet.</p>
-
-<p>Most of the Kubernetes controller configuration will be done through <code>cloud-config</code>, aside from placing the TLS assets on disk. The <code>cloud-config</code> we create will take into account the possibility to have load-balanced controller nodes for High Availability in the future. How this affects our configuration will be discussed in detail in the [Controller Services set up: Master Election](#) section.</p>
+<p>Most of the Kubernetes controller configuration will be done through <code>cloud-config</code>, aside from placing the TLS assets on disk. The <code>cloud-config</code> we are writing will take into account the possibility to have load-balanced controller nodes for High Availability in the future. How this affects our configuration will be discussed in detail in the [Controller Services set up: Master Election](#) section.</p>
 
 <p><span class="note">
 <strong>Note</strong>: The TLS assets shouldn't be stored in the <code>cloud-config</code> for enhanced security. If you do prefer to transfer the TLS assets as part of the <code>cloud-config</code> refer to <a href="https://coreos.com/os/docs/latest/customizing-docker.html#cloud-config5" rel="nofollow">this CoreOS tutorial</a> as an example of storing TLS assets within the <code>cloud-config</code> file.<br></span></p>
-</p>
 
-<p>We will now introduce every Kubernetes component and its configuration to incrementally add to our controller Droplet's <code>cloud-config</code> file and when completed, we will create the controller Droplet with Doctl from our client machine. Once the Droplet is ready we will generate and transfer the TLS assets.</p>
+<p>We will now introduce every Kubernetes component and its configuration to incrementally add to our controller Droplet's <code>cloud-config</code> file.</p>
 
-<h3 id="a-deep-dive-into-the-kubelet">A Deep Dive Into The Kubelet</h3>
+<h3 id="the-kubernetes-kubelet-service">The Kubernetes Kubelet Service</h3>
 
 <p>As seen in the Architectural overview section, Kubernetes is made up of several components. One such fundamental component is the <a href="http://kubernetes.io/v1.1/docs/admin/kubelet.html" rel="nofollow"><code>kubelet</code></a>. The <code>kubelet</code> is responsible for what's running on each individual Droplet within your cluster. You can think of it as a process watcher like <code>systemd</code>, but focused on running containers. It has one job: given a set of containers to run, make sure they are all running.</p>
 
-<p>The unit of execution Kubernetes works with is the <a href="http://kubernetes.io/v1.1/docs/user-guide/pods.html" rel="nofollow">Pod</a>, not the individual container. A Pod is a collection of containers and volumes sharing the same execution environment. The containers within a Pod share a single IP, in our case this IP is provided by Docker within the Flannel overlay network. Pods are defined by a JSON or YAML file called a <a href="http://kubernetes.io/v1.1/docs/api-reference/v1/definitions.html#_v1_pod" rel="nofollow">Pod manifest</a>.</p>
+<p>The unit of execution Kubernetes works with is the <a href="http://kubernetes.io/v1.1/docs/user-guide/pods.html" rel="nofollow">Pod</a>, not an individual container. A Pod is a collection of containers and volumes sharing the same execution environment. The containers within a Pod share a single IP, in our case this IP is provided by Docker within the Flannel overlay network. Pods are defined by a JSON or YAML file called a <a href="http://kubernetes.io/v1.1/docs/api-reference/v1/definitions.html#_v1_pod" rel="nofollow">Pod manifest</a>.</p>
 
-<p>&lt;!-- this is duplicated from the Kubernetes overview part --&gt;<br>
-Within a Kubernetes cluster, the <code>kubelet</code> functions as a local agent that watches for Pod specs via the Kubernetes API server. The <code>kubelet</code> is also responsible for registering a node with a Kubernetes cluster, sending events and pod status, and reporting resource utilization.</p>
+<p>Within a Kubernetes cluster, the <code>kubelet</code> functions as a local agent that watches for Pod specs via the Kubernetes API server. The <code>kubelet</code> is also responsible for registering a node with a Kubernetes cluster, sending events and pod status, and reporting resource utilization.</p>
 
 <p>While the <code>kubelet</code> plays an important role in a Kubernetes cluster, it also works well in standalone mode - outside of a Kubernetes cluster. With the <code>kubelet</code> running in standalone mode we will be able to use containers to distribute our binaries, monitor container resource utilization through the built-in support for <a href="https://github.com/google/cadvisor/blob/master/README.md" rel="nofollow">cAdvisor</a> and establish resource limits for the daemon services. The <code>kubelet</code> provides a convenient interface for managing containers on a local system, allowing us to update our controller services by updating the containers without rebuilding our unit files. To achieve this, the <code>kubelet</code> supports the configuration of a manifest directory, which is monitored for pod manifests every 20 seconds by default.</p>
 
@@ -849,7 +1017,7 @@ Within a Kubernetes cluster, the <code>kubelet</code> functions as a local agent
 
 <p>&lt;!-- TODO: Should we always curl the kubelet for consistency? --&gt;</p>
 
-<p><strong>Note</strong>: Please note that only CoreOS Alpha or Beta images come with the Kubernetes kubelet. The Stable channel has never contained a version which included the <code>kubelet</code>. If a Droplet was booted from the Beta or Alpha channels and then moved to the Stable channel, it will lose the <code>kubelet</code> when it updates to the stable release.<br></p>
+<p><span class="note"><strong>Note</strong>: Please note that only CoreOS Alpha or Beta images come with the Kubernetes kubelet. The Stable channel has never contained a version which included the <code>kubelet</code>. If a Droplet was booted from the Beta or Alpha channels and then moved to the Stable channel, it will lose the <code>kubelet</code> when it updates to the stable release.<br></span></p>
 
 <p>At the time of writing, the CoreOS Alpha image on Digital Ocean has the following version:</p>
 <pre class="code-pre "><code langs=""><div class="secondary-code-label " title="Output">Output</div>$ cat /etc/lsb-release
@@ -860,13 +1028,13 @@ DISTRIB_RELEASE=891.0.0
 <pre class="code-pre "><code langs=""><div class="secondary-code-label " title="Output">Output</div>$ kubelet --version=true
 Kubernetes v1.1.2+3085895
 </code></pre>
-<p>If you are required to use the CoreOS stable channel or need a different Kubelet version, you may <code>curl</code> the <code>kubelet</code> binary as part of the <code>cloud-config</code> using the paths identified in [Step 4 — Understanding Where To Get The Kubernetes Artifacts](#) of this tutorial.</p>
+<p>If you are required to use the CoreOS stable channel or need a different Kubelet version, you may <code>curl</code> the <code>kubelet</code> binary as part of the <code>cloud-config</code> using the paths identified in [Step 5 — Downloading The Kubernetes Artifacts](#) of this tutorial.</p>
 <div class="code-label " title="cloud-config-* - kubelet snippet">cloud-config-* - kubelet snippet</div><pre class="code-pre "><code langs="">...
 ExecStartPre=/usr/bin/curl -sLo /opt/bin/kubelet -z /opt/bin/kubelet https://storage.googleapis.com/kubernetes-release/release/v1.1.2/bin/linux/amd64/kubelet
 ExecStartPre=/usr/bin/chmod +x /opt/bin/kubelet
 ...
 </code></pre>
-<p><strong>Note</strong>: The <code>-z</code> option of <code>curl</code> will only download newer files based on a date expression or, as used here - given an existing local file - only if the date of the remote file is newer than the date of the local file. This will generate a warning if the local file does not exist, as shown below.<br></p>
+<p><span class="note"><strong>Note</strong>: The <code>-z</code> option of <code>curl</code> will only download newer files based on a date expression or, as used here - given an existing local file - only if the date of the remote file is newer than the date of the local file. This will generate a warning if the local file does not exist, as shown below.<br></span></p>
 <pre class="code-pre "><code langs=""><div class="secondary-code-label " title="Output">Output</div>Warning: Illegal date format for -z/--timecond (and not a file name).
 Warning: Disabling time condition. See curl_getdate(3) for valid date syntax.
 </code></pre>
@@ -890,7 +1058,7 @@ Warning: Disabling time condition. See curl_getdate(3) for valid date syntax.
 
 <p><strong>Service Discovery and Kubernetes Services</strong></p>
 
-<p>To enable service discovery within the Kubernetes cluster, we need to provide our <code>kubelet</code> with the service IP for the cluster DNS component as well as the DNS domain. The <code>kubelet</code> will pass this on as the DNS server and DNS search suffix to each container running within the cluster. In this tutorial we will deploy DNS as a service within our Kubernetes cluster through <a href="https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dns" rel="nofollow">the cluster DNS add-on</a>, for which Kubernetes uses cluster Virtual IPs (VIPs). Routing to these VIPs is handled by the Kubernetes proxy components and VIPs are not required to be routable between nodes.</p>
+<p>To enable service discovery within the Kubernetes cluster, we need to provide our <code>kubelet</code> with the service IP for the cluster DNS component as well as the DNS domain. The <code>kubelet</code> will pass this on as the DNS server and DNS search suffix to each container running within the cluster. In this tutorial we will deploy DNS as a service within our Kubernetes cluster through <a href="https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dns" rel="nofollow">the cluster DNS add-on</a> in [Step 11 — Deploying Kubernetes-ready applications](#). Kubernetes uses cluster Virtual IPs (VIPs) for all services defined within the cluster. Routing to these VIPs is handled by the Kubernetes proxy components and VIPs are not required to be routable between nodes.</p>
 
 <p>We configure Kubernetes to use the <code>10.3.0.0/24</code> IP range for all services. Each service will be assigned a cluster IP in this range. This range must not overlap with any IP ranges assigned to Pods as configured in our Flannel overlay network, or the Digital Ocean public and private IP ranges. The API server will take the first IP in that range (<code>10.3.0.1</code>) by itself and we will configure the DNS service to take the static IP of <code>10.3.0.10</code>. Modify these values to mirror your own configuration.</p>
 
@@ -898,20 +1066,20 @@ Warning: Disabling time condition. See curl_getdate(3) for valid date syntax.
 
 <p>If the <code>kubelet</code> is bundled with CoreOS (Alpha/Beta), it is stored on <code>/usr/bin/kubelet</code>, if you manually download (Stable) to another path (<code>/opt/bin/kubelet</code> for example), make sure to update the paths in the snippet below. Prior to starting the Kubelet service, we will also ensure the <code>manifests</code> and <code>ssl</code> directories exist on the host using the <code>ExecStartPre</code> directive, preceded by "-" which indicates to Systemd that failure of the command will be tolerated.</p>
 
-<p>We combine all the information above in the <a href="https://www.digitalocean.com/community/tutorials/understanding-systemd-units-and-unit-files" rel="nofollow">systemd service unit</a> file for running the kubelet. We add a dependency on the <code>docker.service</code> and make sure the unit restarts on failure. This is only a snippet of our controller droplet's full <code>cloud-config</code>:</p>
+<p>We combine all the information above in the systemd service unit file for running the kubelet. We add a dependency on the <code>docker.service</code> and make sure the unit restarts on failure. Here is the relevant <code>cloud-config</code> snippet:</p>
 <div class="code-label " title="cloud-config-controller.yaml kubelet - snippet">cloud-config-controller.yaml kubelet - snippet</div><pre class="code-pre "><code langs="">...
   units:
-    - name: "kube-kubelet.service"
+    - name: "<span class="highlight">kube-kubelet.service</span>"
       command: "start"
       content: |
         [Unit]
         Description=Kubernetes Kubelet
         Documentation=https://github.com/kubernetes/kubernetes
-        Requires=docker.service
-        After=docker.service
+        <span class="highlight">Requires=docker.service</span>
+        <span class="highlight">After=docker.service</span>
         [Service]
-        ExecStartPre=-/bin/bash -c "mkdir -p /etc/kubernetes/{manifests,ssl}"
-        ExecStart=/usr/bin/kubelet \
+        ExecStartPre=<span class="highlight">-/bin/bash -c "mkdir -p /etc/kubernetes/{manifests,ssl}"</span>
+        ExecStart=<span class="highlight">/usr/bin/kubelet</span> \
         --api-servers=http://127.0.0.1:8080 \
         --register-node=false \
         --allow-privileged=true \
@@ -923,18 +1091,98 @@ Warning: Disabling time condition. See curl_getdate(3) for valid date syntax.
         RestartSec=10
 ...
 </code></pre>
-<p>With this configuration, all state-less controller services will be managed through the Pod manifests dropped into the <code>kubelet</code>'s manifest folder (<code>/etc/kubernetes/manifests</code>). After configuring the <code>kube-proxy</code> service next, we will go through the structure of a Pod manifest and the Pod manifest section for each controller service. We will finalize the controller configuration section with an overview of the full Kubernetes controller Pod manifests and the full controller <code>cloud-config</code> file.</p>
+<p>Adding this to our existing <code>cloud-config-controller.yaml</code> gives us the following new contents (changes from line 60 onwards):</p>
+<div class="code-label " title="cloud-config-controller.yaml">cloud-config-controller.yaml</div><pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="1">#cloud-config
+</li><li class="line" prefix="2">
+</li><li class="line" prefix="3">write-files:
+</li><li class="line" prefix="4">  - path: /opt/bin/pull-kube-images.sh
+</li><li class="line" prefix="5">    permissions: '0755'
+</li><li class="line" prefix="6">    content: |
+</li><li class="line" prefix="7">      #!/bin/bash
+</li><li class="line" prefix="8">      tag=1.1.2
+</li><li class="line" prefix="9">      docker_wrapped_binaries=(
+</li><li class="line" prefix="10">        "kube-apiserver"
+</li><li class="line" prefix="11">        "kube-controller-manager"
+</li><li class="line" prefix="12">        "kube-scheduler"
+</li><li class="line" prefix="13">      )
+</li><li class="line" prefix="14">      temp_dir="$(mktemp -d -t 'kube-server-XXXX')"
+</li><li class="line" prefix="15">      for binary in "${docker_wrapped_binaries[@]}"; do
+</li><li class="line" prefix="16">        docker_tag="$(curl -sL https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.docker_tag)"
+</li><li class="line" prefix="17">        curl -sLo ${temp_dir}/${binary}.tar https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.tar
+</li><li class="line" prefix="18">        docker load -i ${temp_dir}/${binary}.tar
+</li><li class="line" prefix="19">        docker tag -f "gcr.io/google_containers/${binary}:${docker_tag}" "${binary}:${tag}"
+</li><li class="line" prefix="20">      done;
+</li><li class="line" prefix="21">      rm -rf "${temp_dir}";
+</li><li class="line" prefix="22">      exit $?
+</li><li class="line" prefix="23">coreos:
+</li><li class="line" prefix="24">  etcd2:
+</li><li class="line" prefix="25">    proxy: on 
+</li><li class="line" prefix="26">    listen-client-urls: http://localhost:2379
+</li><li class="line" prefix="27">    initial-cluster: "etcd-01=ETCD_PEER"
+</li><li class="line" prefix="28">  units:
+</li><li class="line" prefix="29">    - name: "etcd2.service"
+</li><li class="line" prefix="30">      command: "start"
+</li><li class="line" prefix="31">    - name: "flanneld.service"
+</li><li class="line" prefix="32">      command: start
+</li><li class="line" prefix="33">      drop-ins:
+</li><li class="line" prefix="34">        - name: 50-network-config.conf
+</li><li class="line" prefix="35">          content: |
+</li><li class="line" prefix="36">            [Unit]
+</li><li class="line" prefix="37">            Requires=etcd2.service
+</li><li class="line" prefix="38">            [Service]
+</li><li class="line" prefix="39">            ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.2.0.0/16", "Backend": {"Type": "vxlan"}}'
+</li><li class="line" prefix="40">    - name: "docker.service"
+</li><li class="line" prefix="41">      command: start
+</li><li class="line" prefix="42">      drop-ins:
+</li><li class="line" prefix="43">        - name: 40-flannel.conf
+</li><li class="line" prefix="44">          content: |
+</li><li class="line" prefix="45">            [Unit]
+</li><li class="line" prefix="46">            Requires=flanneld.service
+</li><li class="line" prefix="47">            After=flanneld.service
+</li><li class="line" prefix="48">    - name: "pull-kube-images.service"
+</li><li class="line" prefix="49">      command: start
+</li><li class="line" prefix="50">      content: |
+</li><li class="line" prefix="51">        [Unit]
+</li><li class="line" prefix="52">        Description=Pull and load all Docker wrapped Kubernetes binaries
+</li><li class="line" prefix="53">        Documentation=https://github.com/kubernetes/kubernetes
+</li><li class="line" prefix="54">        Requires=network-online.target docker.service
+</li><li class="line" prefix="55">        After=network-online.target docker.service
+</li><li class="line" prefix="56">        [Service]
+</li><li class="line" prefix="57">        ExecStart=/opt/bin/pull-kube-images.sh
+</li><li class="line" prefix="58">        RemainAfterExit=yes
+</li><li class="line" prefix="59">        Type=oneshot
+</li><li class="line" prefix="60">    - name: "<span class="highlight">kube-kubelet.service</span>"
+</li><li class="line" prefix="61">      command: "start"
+</li><li class="line" prefix="62">      content: |
+</li><li class="line" prefix="63">        [Unit]
+</li><li class="line" prefix="64">        Description=Kubernetes Kubelet
+</li><li class="line" prefix="65">        Documentation=https://github.com/kubernetes/kubernetes
+</li><li class="line" prefix="66">        Requires=docker.service
+</li><li class="line" prefix="67">        After=docker.service
+</li><li class="line" prefix="68">        [Service]
+</li><li class="line" prefix="69">        ExecStartPre=-/bin/bash -c "mkdir -p /etc/kubernetes/{manifests,ssl}"
+</li><li class="line" prefix="70">        ExecStart=/usr/bin/kubelet \
+</li><li class="line" prefix="71">        --api-servers=http://127.0.0.1:8080 \
+</li><li class="line" prefix="72">        --register-node=false \
+</li><li class="line" prefix="73">        --allow-privileged=true \
+</li><li class="line" prefix="74">        --config=/etc/kubernetes/manifests \
+</li><li class="line" prefix="75">        --hostname-override=$public_ipv4 \
+</li><li class="line" prefix="76">        --cluster-dns=10.3.0.10 \
+</li><li class="line" prefix="77">        --cluster-domain=cluster.local
+</li><li class="line" prefix="78">        Restart=always
+</li><li class="line" prefix="79">        RestartSec=10
+</li></ul></code></pre>
+<p>With this configuration, all state-less controller services will be managed through the Pod manifests dropped into the <code>kubelet</code>'s manifest folder (<code>/etc/kubernetes/manifests</code>). After configuring the <code>kube-proxy</code> service next, we will go through the structure of a Pod manifest and the Pod manifest for each controller service. We will finalize the controller configuration section with an overview of the full Kubernetes controller Pod manifests.</p>
 
-<h3 id="running-the-kubernetes-proxy-service">Running the Kubernetes Proxy Service</h3>
+<h3 id="the-kubernetes-proxy-service">The Kubernetes Proxy Service</h3>
 
 <p>All nodes should run <code>kube-proxy</code> (Running <code>kube-proxy</code> on a "controller" node is not strictly required, but being consistent is easier.) The proxy is responsible for directing traffic destined for specific services and pods to the correct location. The proxy communicates with the API server periodically to keep up to date.</p>
 
-<p>&lt;!-- TODO: change "option" to "command" --&gt;<br>
-Unlike the <code>kubelet</code>, the <code>kube-proxy</code> binary is currently not shipped with any CoreOS release. The URL to download the binary is described in [Step 4 — Understanding Where To Get The Kubernetes Artifacts](#) of this tutorial. We will <code>curl</code> the binary from this URL prior to starting the service by providing the following <code>ExecStartPre</code> directives within the <code>[Service]</code> section of our Systemd unit:</p>
+<p>Unlike the <code>kubelet</code>, the <code>kube-proxy</code> binary is currently not shipped with any CoreOS release and we will always  need to download it. The URL to download the binary is described in [Step 5 — Downloading The Kubernetes Artifacts](#) of this tutorial. We will <code>curl</code> the binary from this URL prior to starting the service by providing the following <code>ExecStartPre</code> directives within the <code>[Service]</code> section of our Systemd unit:</p>
 <pre class="code-pre "><code langs="">ExecStartPre=/usr/bin/curl -sLo /opt/bin/kube-proxy -z /opt/bin/kube-proxy https://storage.googleapis.com/kubernetes-release/release/v1.1.2/bin/linux/amd64/kube-proxy
 ExecStartPre=/usr/bin/chmod +x /opt/bin/kube-proxy
 </code></pre>
-<p>We will also delay the <code>kube-proxy</code> daemon from starting until the <code>kube-apiserver</code> service has started with the following <code>ExecStartPre</code> option:</p>
+<p>We will also delay the <code>kube-proxy</code> daemon from trying to connect to the API server until the <code>kube-apiserver</code> service has started with the following <code>ExecStartPre</code> directive:</p>
 <pre class="code-pre "><code langs="">ExecStartPre=/bin/bash -c "until /usr/bin/curl http://127.0.0.1:8080; do echo \"waiting for API server to come online...\"; sleep 3; done"
 </code></pre>
 <p>Both the controller and worker nodes in your cluster will run the proxy. The following <code>kube-proxy</code> parameters will be defined in our systemd service unit:</p>
@@ -944,111 +1192,122 @@ ExecStartPre=/usr/bin/chmod +x /opt/bin/kube-proxy
 <li><code>--proxy-mode=iptables</code>: The proxy mode for our <code>kube-proxy</code>. At the time of writing the following two options are valid: <code>userspace</code> (older, stable) or <code>iptables</code> (experimental). If the <code>iptables</code> mode is selected, but the system's kernel or iptables versions are insufficient, this always falls back to the <code>userspace</code> proxy.</li>
 <li><code>--hostname-override=$public_ipv4</code>: to facilitate routing without DNS resolution.</li>
 </ul>
-<div class="code-label " title="cloud-config-controller.yaml kube-proxy - snippet">cloud-config-controller.yaml kube-proxy - snippet</div><pre class="code-pre "><code langs="">
-  units:
-    - name: kube-proxy.service
-      command: start
-      content: |
-        [Unit]
-        Description=Kubernetes Proxy
-        Documentation=https://github.com/kubernetes/kubernetes
-        Requires=network-online.target
-        After=network-online.target
-        [Service]
-        ExecStartPre=/usr/bin/curl -sLo /opt/bin/kube-proxy -z /opt/bin/kube-proxy https://storage.googleapis.com/kubernetes-release/release/v1.1.2/bin/linux/amd64/kube-proxy
-        ExecStartPre=/usr/bin/chmod +x /opt/bin/kube-proxy
-        # wait for kube-apiserver to be up and ready
-        ExecStartPre=/bin/bash -c "until /usr/bin/curl http://127.0.0.1:8080; do echo \"waiting for API server to come online...\"; sleep 3; done"
-        ExecStart=/opt/bin/kube-proxy \
-        --master=http://127.0.0.1:8080 \
-        --proxy-mode=iptables \
-        --hostname-override=$public_ipv4
-        TimeoutStartSec=10
-        Restart=always
-        RestartSec=10
-</code></pre>
+
+<p>Add the kube-proxy Systemd Service Unit definition to your <code>cloud-config-controller.yaml</code>. We insert this <strong>before</strong> the Kubelet Service to ensure the <code>kube-proxy</code> binary is downloaded and started as soon as possible.</p>
+<div class="code-label " title="cloud-config-controller.yaml">cloud-config-controller.yaml</div><pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="1">#cloud-config
+</li><li class="line" prefix="2">
+</li><li class="line" prefix="3">write-files:
+</li><li class="line" prefix="4">  - path: /opt/bin/pull-kube-images.sh
+</li><li class="line" prefix="5">    permissions: '0755'
+</li><li class="line" prefix="6">    content: |
+</li><li class="line" prefix="7">      #!/bin/bash
+</li><li class="line" prefix="8">      tag=1.1.2
+</li><li class="line" prefix="9">      docker_wrapped_binaries=(
+</li><li class="line" prefix="10">        "kube-apiserver"
+</li><li class="line" prefix="11">        "kube-controller-manager"
+</li><li class="line" prefix="12">        "kube-scheduler"
+</li><li class="line" prefix="13">      )
+</li><li class="line" prefix="14">      temp_dir="$(mktemp -d -t 'kube-server-XXXX')"
+</li><li class="line" prefix="15">      for binary in "${docker_wrapped_binaries[@]}"; do
+</li><li class="line" prefix="16">        docker_tag="$(curl -sL https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.docker_tag)"
+</li><li class="line" prefix="17">        curl -sLo ${temp_dir}/${binary}.tar https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.tar
+</li><li class="line" prefix="18">        docker load -i ${temp_dir}/${binary}.tar
+</li><li class="line" prefix="19">        docker tag -f "gcr.io/google_containers/${binary}:${docker_tag}" "${binary}:${tag}"
+</li><li class="line" prefix="20">      done;
+</li><li class="line" prefix="21">      rm -rf "${temp_dir}";
+</li><li class="line" prefix="22">      exit $?
+</li><li class="line" prefix="23">coreos:
+</li><li class="line" prefix="24">  etcd2:
+</li><li class="line" prefix="25">    proxy: on 
+</li><li class="line" prefix="26">    listen-client-urls: http://localhost:2379
+</li><li class="line" prefix="27">    initial-cluster: "etcd-01=ETCD_PEER"
+</li><li class="line" prefix="28">  units:
+</li><li class="line" prefix="29">    - name: "etcd2.service"
+</li><li class="line" prefix="30">      command: "start"
+</li><li class="line" prefix="31">    - name: "flanneld.service"
+</li><li class="line" prefix="32">      command: start
+</li><li class="line" prefix="33">      drop-ins:
+</li><li class="line" prefix="34">        - name: 50-network-config.conf
+</li><li class="line" prefix="35">          content: |
+</li><li class="line" prefix="36">            [Unit]
+</li><li class="line" prefix="37">            Requires=etcd2.service
+</li><li class="line" prefix="38">            [Service]
+</li><li class="line" prefix="39">            ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.2.0.0/16", "Backend": {"Type": "vxlan"}}'
+</li><li class="line" prefix="40">    - name: "docker.service"
+</li><li class="line" prefix="41">      command: start
+</li><li class="line" prefix="42">      drop-ins:
+</li><li class="line" prefix="43">        - name: 40-flannel.conf
+</li><li class="line" prefix="44">          content: |
+</li><li class="line" prefix="45">            [Unit]
+</li><li class="line" prefix="46">            Requires=flanneld.service
+</li><li class="line" prefix="47">            After=flanneld.service
+</li><li class="line" prefix="48">    - name: "pull-kube-images.service"
+</li><li class="line" prefix="49">      command: start
+</li><li class="line" prefix="50">      content: |
+</li><li class="line" prefix="51">        [Unit]
+</li><li class="line" prefix="52">        Description=Pull and load all Docker wrapped Kubernetes binaries
+</li><li class="line" prefix="53">        Documentation=https://github.com/kubernetes/kubernetes
+</li><li class="line" prefix="54">        Requires=network-online.target docker.service
+</li><li class="line" prefix="55">        After=network-online.target docker.service
+</li><li class="line" prefix="56">        [Service]
+</li><li class="line" prefix="57">        ExecStart=/opt/bin/pull-kube-images.sh
+</li><li class="line" prefix="58">        RemainAfterExit=yes
+</li><li class="line" prefix="59">        Type=oneshot
+</li><li class="line" prefix="60">    - name: "<span class="highlight">kube-proxy.service</span>"
+</li><li class="line" prefix="61">      command: start
+</li><li class="line" prefix="62">      content: |
+</li><li class="line" prefix="63">        [Unit]
+</li><li class="line" prefix="64">        Description=Kubernetes Proxy
+</li><li class="line" prefix="65">        Documentation=https://github.com/kubernetes/kubernetes
+</li><li class="line" prefix="66">        Requires=network-online.target
+</li><li class="line" prefix="67">        After=network-online.target
+</li><li class="line" prefix="68">        [Service]
+</li><li class="line" prefix="69">        ExecStartPre=/usr/bin/curl -sLo /opt/bin/kube-proxy -z /opt/bin/kube-proxy https://storage.googleapis.com/kubernetes-release/release/v1.1.2/bin/linux/amd64/kube-proxy
+</li><li class="line" prefix="70">        ExecStartPre=/usr/bin/chmod +x /opt/bin/kube-proxy
+</li><li class="line" prefix="71">        # wait for kube-apiserver to be up and ready
+</li><li class="line" prefix="72">        ExecStartPre=/bin/bash -c "until /usr/bin/curl http://127.0.0.1:8080; do echo \"waiting for API server to come online...\"; sleep 3; done"
+</li><li class="line" prefix="73">        ExecStart=/opt/bin/kube-proxy \
+</li><li class="line" prefix="74">        --master=http://127.0.0.1:8080 \
+</li><li class="line" prefix="75">        --proxy-mode=iptables \
+</li><li class="line" prefix="76">        --hostname-override=$public_ipv4
+</li><li class="line" prefix="77">        <span class="highlight">TimeoutStartSec=10</span>
+</li><li class="line" prefix="78">        Restart=always
+</li><li class="line" prefix="79">        RestartSec=10
+</li><li class="line" prefix="80">    - name: "kube-kubelet.service"
+</li><li class="line" prefix="81">      command: "start"
+</li><li class="line" prefix="82">      content: |
+</li><li class="line" prefix="83">        [Unit]
+</li><li class="line" prefix="84">        Description=Kubernetes Kubelet
+</li><li class="line" prefix="85">        Documentation=https://github.com/kubernetes/kubernetes
+</li><li class="line" prefix="86">        Requires=docker.service
+</li><li class="line" prefix="87">        After=docker.service
+</li><li class="line" prefix="88">        [Service]
+</li><li class="line" prefix="89">        ExecStartPre=-/bin/bash -c "mkdir -p /etc/kubernetes/{manifests,ssl}"
+</li><li class="line" prefix="90">        ExecStart=/usr/bin/kubelet \
+</li><li class="line" prefix="91">        --api-servers=http://127.0.0.1:8080 \
+</li><li class="line" prefix="92">        --register-node=false \
+</li><li class="line" prefix="93">        --allow-privileged=true \
+</li><li class="line" prefix="94">        --config=/etc/kubernetes/manifests \
+</li><li class="line" prefix="95">        --hostname-override=$public_ipv4 \
+</li><li class="line" prefix="96">        --cluster-dns=10.3.0.10 \
+</li><li class="line" prefix="97">        --cluster-domain=cluster.local
+</li><li class="line" prefix="98">        Restart=always
+</li><li class="line" prefix="99">        RestartSec=10
+</li></ul></code></pre>
 <p><strong>Note</strong>: At the time of writing, the <code>kube-proxy</code> binary is 18.3MB while the docker wrapped image based on Debian with the Iptables package installed is over 180MB, downloading the <code>kube-proxy</code> binary takes less than 10 seconds and is therefore the method used in this tutorial as opposed to running the proxy in a privileged Hyperkube container.</p>
 
 <p><span class="note">
-<strong>Note</strong>: By setting the <code>TimeoutStartSec</code> to 10, Systemd will fail the kube-proxy if it hasn't started after 10 seconds, but it will be restarted after the specified <code>RestartSec</code> timeout. We may notice these failures in the journal until the <code>kube-apiserver</code> has started. Until we are certain the <code>kube-apiserver</code> has started, these warning may be ignored.<br></span></p>
+<strong>Note</strong>: By setting the <code>TimeoutStartSec</code> to 10, Systemd will fail the kube-proxy if it hasn't started after 10 seconds, but it will be restarted after the specified <code>RestartSec</code> timeout. We may notice these failures in the journal until the <code>kube-apiserver</code> has started. Until we are certain the <code>kube-apiserver</code> has started, these warning may be ignored. The <code>cloudinit</code> utility will only continue with the next service after Systemd has failed the <code>kube-proxy</code> once.<br></span></p>
 
-<p>For the full overview of all <code>kube-proxy</code> arguments, refer to <a href="https://github.com/kubernetes/kubernetes/blob/release-1.1/docs/admin/kube-proxy.md" rel="nofollow">the official documentation</a>.</p>
+<p>For the full overview of all <code>kube-proxy</code> arguments, refer to <a href="https://github.com/kubernetes/kubernetes/blob/release-1.1/docs/admin/kube-proxy.md" rel="nofollow">the official Kubernetes documentation</a>.</p>
 
-<h3 id="pre-loading-kubernetes-containers">Pre-Loading Kubernetes containers</h3>
+<h2 id="step-7-—-the-kubernetes-controller-pods">Step 7 — The Kubernetes Controller Pods</h2>
 
-<p>As seen in [Step 4 — Understanding Where To Get The Kubernetes Artifacts](#) of this tutorial, we may pull the combined <code>hyperkube</code> image (<code>gcr.io/google_containers/hyperkube:v1.1.2</code>), use the unofficial Kubernetes Up and Running Images (<code>b.gcr.io/kuar/$binary:$version</code>) or <code>curl</code> and <code>load</code> each image individually.</p>
-
-<p>As explained earlier, we will <code>curl</code> and <code>load</code> each image individually, see <a href="http://kubernetes.io/v1.1/docs/user-guide/images.html#pre-pulling-images" rel="nofollow">Pre-pulling images</a> for details on how pre-pulled images may affect the Kubelet setup. The following script combines the commands described in Step 4:</p>
-<div class="code-label " title="pull-kube-images.sh">pull-kube-images.sh</div><pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="1">
-</li><li class="line" prefix="2">#!/bin/bash
-</li><li class="line" prefix="3">tag=1.1.2
-</li><li class="line" prefix="4">docker_wrapped_binaries=(
-</li><li class="line" prefix="5">   "kube-apiserver"
-</li><li class="line" prefix="6">   "kube-controller-manager"
-</li><li class="line" prefix="7">   "kube-scheduler"
-</li><li class="line" prefix="8">   #"kube-proxy"
-</li><li class="line" prefix="9">)
-</li><li class="line" prefix="10">temp_dir="$(mktemp -d -t 'kube-server-XXXX')"
-</li><li class="line" prefix="11">
-</li><li class="line" prefix="12">for binary in "${docker_wrapped_binaries[@]}"; do
-</li><li class="line" prefix="13">  docker_tag="$(curl -sL https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.docker_tag)"
-</li><li class="line" prefix="14">  echo "downloading ${binary} ${docker_tag}"
-</li><li class="line" prefix="15">  curl -Lo ${temp_dir}/${binary}.tar https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.tar
-</li><li class="line" prefix="16">  echo "loading docker image"
-</li><li class="line" prefix="17">  docker load -i ${temp_dir}/${binary}.tar
-</li><li class="line" prefix="18">  echo "tagging docker image as ${binary} ${tag}"
-</li><li class="line" prefix="19">  docker tag -f "gcr.io/google_containers/${binary}:${docker_tag}" "${binary}:${tag}"
-</li><li class="line" prefix="20">done
-</li><li class="line" prefix="21">
-</li><li class="line" prefix="22">echo "cleaning up temp dir"
-</li><li class="line" prefix="23">rm -rf "${temp_dir}"
-</li></ul></code></pre>
-<p>You may modify this script to push these images to a local registry to simplify the provisioning of your cluster nodes, assuming a local Docker registry is available. In this case, our cluster nodes will easily pull the containers from the local registry and we do not need to include this script as part of our controller Droplet configuration. For this tutorial, we assume such registry is not available and embed the above script into the <code>cloud-config</code> file of every controller node.</p>
-
-<p>After embedding this script in a Systemd unit, stripping the detailed output and specifying that the network needs to be up as well as the docker service needs to be successfully loaded, our <code>cloud-config</code> file will have the following snippet to pre-pull the Kubernetes images:</p>
-<div class="code-label " title="cloud-config-controller.yaml pull-kube-images - snippet">cloud-config-controller.yaml pull-kube-images - snippet</div><pre class="code-pre "><code langs="">...
-write-files:
-  - path: /opt/bin/pull-kube-images.sh
-    permissions: '0755'
-    content: |
-      #!/bin/bash
-      tag=1.1.2
-      docker_wrapped_binaries=(
-        "kube-apiserver"
-        "kube-controller-manager"
-        "kube-scheduler"
-      )
-      temp_dir="$(mktemp -d -t 'kube-server-XXXX')"
-      for binary in "${docker_wrapped_binaries[@]}"; do
-        docker_tag="$(curl -sL https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.docker_tag)"
-        curl -sLo ${temp_dir}/${binary}.tar https://storage.googleapis.com/kubernetes-release/release/v${tag}/bin/linux/amd64/${binary}.tar
-        docker load -i ${temp_dir}/${binary}.tar
-        docker tag -f "gcr.io/google_containers/${binary}:${docker_tag}" "${binary}:${tag}"
-      done;
-      rm -rf "${temp_dir}";
-      exit $?
-...
-coreos:
-  units:
-    - name: pull-kube-images.service
-      command: start
-      content: |
-        [Unit]
-        Description=Pull and load all Docker wrapped Kubernetes binaries
-        Documentation=https://github.com/kubernetes/kubernetes
-        Requires=network-online.target docker.service
-        After=network-online.target docker.service
-        [Service]
-        ExecStart=/opt/bin/pull-kube-images.sh
-        RemainAfterExit=yes
-        Type=oneshot
-...
-</code></pre>
-<p>In the above <code>cloud-config</code> snippet, we use the <code>write_files</code> directive to store the script on disk and make it executable as well as define a <code>oneshot</code> service to run that script. All our controller services will depend on the successful completion of this service. Oneshot services are flagged as successful by Systemd even after exiting.</p>
-
-<h3 id="introduction-to-kubernetes-manifest-files">Introduction to Kubernetes Manifest files</h3>
+<p>For every controller node, state-less and state-full services will be managed by the Kubelet using Pods. All state-less controller services will be managed through the Kubernetes manifest files dropped into the <code>kubelet</code>'s manifest folder (<code>/etc/kubernetes/manifests</code>). All state-full controller services will be defined in Kubernetes manifest files managed by state-less master elector Pods. To understand this configuration, we require a good understanding of Kubernetes Manifest files.</p>
 
 <p>Our kubelet will be used to manage our controller services within containers based on manifest files. In this section we will have a closer look at the structure of these files, you may refer to this section to understand manifest files better.</p>
+
+<h3 id="introduction-to-kubernetes-manifest-files">Introduction to Kubernetes Manifest files</h3>
 
 <p>Kubernetes manifests can be written using YAML or JSON, but only YAML provides the ability to add comments. All of the manifests accepted and returned by the server have a schema, identified by the <code>kind</code> and <code>apiVersion</code> fields. These fields are required for proper decoding of the object.</p>
 
@@ -1089,7 +1348,7 @@ spec:
   - name: "kube-apiserver"
   ...
 </code></pre>
-<h3 id="controller-services-set-up-master-election">Controller Services set up: Master Election</h3>
+<h3 id="master-election">Master Election</h3>
 
 <p>By using a single Kubernetes controller Droplet, we have a single point of failure in our infrastructure. To ensure high availability we will need to run multiple controller nodes at some point. Every stateless Kubernetes component, such as the <code>kube-apiserver</code>, can be scaled across multiple controller nodes without concern. However, there are components which modify the state of the cluster, such as the <code>kube-controller-manager</code> and the <code>kube-scheduler</code>. Of these components, only one instance may modify the state at a time. To achieve this, we need to have a way to ensure only 1 instance for each of these components is running which is done by setting up master election per component.</p>
 
@@ -1105,7 +1364,7 @@ spec:
 
 <p>As our Podmasters depend on Kubernetes volumes, we will see the full Podmaster configurations after defining the Kubernetes volumes and <code>kube-apiserver</code> Pod manifests.</p>
 
-<h3 id="controller-services-set-up-kubernetes-volumes">Controller Services set up: Kubernetes Volumes</h3>
+<h3 id="kubernetes-volumes">Kubernetes Volumes</h3>
 
 <p>At its core, a Kubernetes volume is just a directory, possibly with some data in it, which is accessible to the containers in a Pod. How that directory comes to be, the medium that backs it, and the contents of it are determined by the particular volume type used. Each volume type is backed by a Kubernetes volume plug-in.</p>
 
@@ -1146,7 +1405,7 @@ spec:
         path: /etc/kubernetes/manifests
       name: manifest-dst
 </code></pre>
-<h3 id="controller-services-set-up-the-kube-apiserver">Controller Services set up: The kube-apiserver</h3>
+<h3 id="the-kube-apiserver">The kube-apiserver</h3>
 
 <p>The first controller service we will configure in our controller Pod manifest is the API server. The API server is where most of the magic happens. It is stateless by design and takes in API requests, processes them and stores the result in Etcd if needed, and then returns the result of the request. the API server will run on every controller Droplet and will be stored directly under the kubelet manifest folder.</p>
 
@@ -1210,7 +1469,9 @@ spec:
 
 <p>Refer to the full <a href="http://kubernetes.io/v1.1/docs/admin/kube-apiserver.html" rel="nofollow">kube-apiserver reference</a> for a full overview of all API server flags.</p>
 
-<h3 id="controller-services-set-up-the-kube-system-namespace">Controller Services set up: The kube-system namespace</h3>
+<h3 id="creating-the-kube-system-namespace">Creating The kube-system namespace</h3>
+
+<p>&lt;!-- Move to Step 8 — Finalizing the Controller Cloud Config? --&gt;</p>
 
 <p>As soon as the <code>kube-apiserver</code> is available we need to create the <code>kube-system</code> namespace used by our controller services or our cluster nodes won't be able to discover them. In this section we define the Systemd unit responsible for this. </p>
 
@@ -1240,7 +1501,7 @@ coreos:
         RemainAfterExit=yes
         Type=oneshot
 </code></pre>
-<h3 id="controller-services-set-up-the-kube-podmaster">Controller Services set up: The kube-podmaster</h3>
+<h3 id="the-kube-podmaster">The kube-podmaster</h3>
 
 <p>In this section we add our Podmaster containers to our <code>kube-controller</code> Pod manifest. As mentioned in the [Controller Services: Master Election](#) section of this tutorial, the <code>kube-scheduler</code> and <code>kube-controller-manager</code> services require master election. We will create 1 Podmaster container for each component requiring master election and define the Pod manifests in the following sections.</p>
 
@@ -1376,6 +1637,8 @@ coreos:
 </li></ul></code></pre>
 <h3 id="the-kube-controller-pod-pre-conditions">The kube-controller Pod Pre-conditions</h3>
 
+<p>&lt;!-- Move to Step 8 — Finalizing the Controller Cloud Config? --&gt;</p>
+
 <p>The <code>kube-apiserver</code> requires the TLS assets to be in place, if these are not in place the container will die after starting. The <code>kubelet</code> will create a new container every 5 minutes until the container stays up. To keep the error logs and dead containers minimal during first boot, we prefer to hold off on putting the <code>kube-controller</code> Pod manifest in the kubelet manifest directory until the <code>kube-apiserver</code> TLS assets are available. We will use the <code>write_files</code> directive to create the <code>kube-controller</code> Pod manifest under the <code>/srv/kubernetes/manifests/</code> Path until then.</p>
 
 <p>We will use a Systemd unit to monitor the <code>/etc/kubernetes/ssl</code> path and copy the <code>kube-controller</code> manifest file to the kubelet manifest directory as soon as the TLS assets are detected.</p>
@@ -1403,7 +1666,7 @@ coreos:
 </code></pre>
 <p>We will now proceed with defining the master elected <code>kube-scheduler</code> and <code>kube-controller-manager</code> Pod manifests which will also be stored under the <code>/srv/kubernetes/manifests</code> path.</p>
 
-<h3 id="controller-services-set-up-the-kube-controller-manager-pod-manifest">Controller Services set up: The kube-controller-manager Pod manifest</h3>
+<h3 id="the-kube-controller-manager-pod-manifest">The kube-controller-manager Pod manifest</h3>
 
 <p>The controller manager embeds the core control loops within Kubernetes such as the replication controller, endpoints controller, namespace controller and serviceaccount controller. In short, a control loop watches the shared state of the cluster through the <code>kube-apiserver</code> and makes changes attempting to move the current state towards the desired state.</p>
 
@@ -1518,7 +1781,7 @@ spec:
 </li><li class="line" prefix="36">          name: ssl-certs-host
 </li><li class="line" prefix="37">          readOnly: true
 </li></ul></code></pre>
-<h3 id="controller-services-set-up-the-kube-scheduler-pod-manifest">Controller Services set up: The kube-scheduler Pod manifest</h3>
+<h3 id="the-kube-scheduler-pod-manifest">The kube-scheduler Pod manifest</h3>
 
 <p>The scheduler is the last major piece of our control services. It monitors the API for unscheduled pods, finds them a machine to run on, and communicates the decision back to the API.</p>
 
@@ -1547,9 +1810,13 @@ spec:
 </li></ul></code></pre>
 <p>Refer to <a href="http://kubernetes.io/v1.1/docs/admin/kube-scheduler.html" rel="nofollow">the official kube-scheduler reference</a> for a full overview of all arguments.</p>
 
+<h2 id="step-8-—-finalizing-the-controller-cloud-config-and-provisioning-the-controller-droplet">Step 8 — Finalizing the Controller Cloud Config and Provisioning the Controller Droplet</h2>
+
+<p>We will embed the Pod manifest files constructed in Step 7 into our controller <code>cloud-config</code> file.</p>
+
 <h3 id="embedding-all-pod-manifests-into-the-controller-cloud-config">Embedding all Pod manifests into the Controller cloud-config</h3>
 
-<p>We will embed the Pod manifest files constructed above into our controller <code>cloud-config</code> file and store each manifest under the following paths:</p>
+<p>We will store each manifest under the following paths:</p>
 
 <ol>
 <li>/srv/kubernetes/manifests/kube-scheduler.yaml</li>
@@ -1736,7 +2003,7 @@ spec:
 
 <p>In a multi-controller set-up, every controller node may be created using this <code>cloud-config</code>, although the <code>flanneld</code> drop-in and <code>create-kube-system.service</code> unit only need to be ran once within the cluster and are not required on subsequent controller nodes.</p>
 
-<p>&lt;!-- TODO: test if including the flannel config commands twice cause the other controller nodes to fail? --&gt;</p>
+<p>&lt;!-- TODO: test if including the flannel config commands twice cause the other controller nodes to fail? It should not--&gt;</p>
 
 <p>As we are running a single controller node, we are also turning off CoreOS updates and reboots in our <code>cloud-config</code>.</p>
 <div class="code-label " title="cloud-config-controller.yaml">cloud-config-controller.yaml</div><pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="1">#cloud-config
@@ -2014,6 +2281,8 @@ spec:
 </li><li class="line" prefix="273">    group: alpha
 </li><li class="line" prefix="274">    reboot-strategy: off
 </li></ul></code></pre>
+<h3 id="create-the-controller-droplet">Create the Controller Droplet</h3>
+
 <p><a href="https://coreos.com/validate" rel="nofollow">Validate</a> your cloud-config file, then create your <code>kube-controller-01</code> droplet with the following Doctl command. :</p>
 
 <p>Ensure your <code>ETCD_PEER</code> environment variable is still set from the [Deploy the data storage back end](#) section of this tutorial:</p>
@@ -2043,12 +2312,6 @@ spec:
 </li></ul></code></pre>
 <p>We parse the private and public IPs out as explained in the [Working with doctl responses](#) section of this tutorial.</p>
 
-<p>&lt;!--</p>
-
-<p>Combined:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">read CONTROLLER_PUBLIC_IP2 CONTROLLER_PRIVATE_IP2 &lt;&lt;&lt;$(echo $CONTROLLER_JSON | jq -r '.networks.v4[] | select(.type == "public"), select(.type == "private") | .ip_address')
-</li></ul></code></pre>
-<p>--&gt;</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">CONTROLLER_PUBLIC_IP=`echo $CONTROLLER_JSON | jq -r '.networks.v4[] | select(.type == "public") | .ip_address'`
 </li><li class="line" prefix="$">CONTROLLER_PRIVATE_IP=`echo $CONTROLLER_JSON | jq -r '.networks.v4[] | select(.type == "private") | .ip_address'`
 </li></ul></code></pre>
@@ -2154,15 +2417,9 @@ ams2
 </li><li class="line" prefix="$"> -extensions v3_req \
 </li><li class="line" prefix="$"> -extfile openssl.cnf
 </li></ul></code></pre>
-<p>&lt;!-- </p>
 
-<p>We no longer need the CSR, delete the <code>apiserver.csr</code>:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">rm apiserver.csr
-</li></ul></code></pre>
-<p>--&gt;</p>
-
-<p>[note]<br>
-<strong>Note</strong>: the above command does not work on <code>git-for-windows</code> due to windows path conversions, it is recommended to copy the <code>apiserver.csr</code> and <code>openssl.cnf</code> to <code>~/.kube/</code> and just run the command from within the <code>~/.kube/</code> directory (without the <code>"$HOME/.kube/"</code> parts)<br>
+<p><span class="note">
+<strong>Note</strong>: the above command does not work on <code>git-for-windows</code> due to windows path conversions, it is recommended to copy the <code>apiserver.csr</code> and <code>openssl.cnf</code> to <code>~/.kube/</code> and just run the command from within the <code>~/.kube/</code> directory (without the <code>"$HOME/.kube/"</code> parts)<br></span>
 </p>
 
 <p>Copy the necessary certificates to the controller node. The <code>core</code> user does not have write permissions to <code>/etc/kubernetes/ssl</code> directly, thus we store the files in the home directory first.</p>
@@ -2223,9 +2480,9 @@ Error flushing userspace chain: error flushing chain "KUBE-NODEPORT-CONTAINER": 
 
 <p>At this stage we can configure our client to communicate with our Kubernetes Controller, although we do not have any worker nodes and won't be able to start the workload yet, this will ensure our configuration is working so far.</p>
 
-<p><strong>Note</strong>: We may re-use the same Controller cloud-config files to spin-up a cluster of Controller Droplets with a load balancer in front of it. In this case, our apiserver certificate should have included all necessary IP addresses (such as the Load Balancer IP) for proper TLS authentication.</p>
+<p><span class="note"><strong>Note</strong>: We may re-use the same Controller cloud-config files to spin-up a cluster of Controller Droplets with a load balancer in front of it. In this case, our apiserver certificate should have included all necessary IP addresses (such as the Load Balancer IP) for proper TLS authentication.</span></p>
 
-<h2 id="step-8-—-setting-up-the-kubernetes-cluster-administrator">Step 8 — Setting Up The Kubernetes Cluster Administrator</h2>
+<h2 id="step-9-—-setting-up-the-kubernetes-cluster-administrator">Step 9 — Setting Up The Kubernetes Cluster Administrator</h2>
 
 <h3 id="generate-the-cluster-administrator-keypair">Generate the Cluster Administrator Keypair</h3>
 
@@ -2240,15 +2497,6 @@ Error flushing userspace chain: error flushing chain "KUBE-NODEPORT-CONTAINER": 
 </li></ul></code></pre>
 <p>From now on, the administrator can use his <code>admin-key.pem</code> and signed certificate <code>admin.pem</code> to connect to the Kubernetes cluster.</p>
 
-<p>&lt;!--</p>
-
-<p>TODO: also remove the apiserver csr...</p>
-
-<p>We no longer need the <code>admin.csr</code> file:</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">rm admin.csr
-</li></ul></code></pre>
-<p>--&gt;</p>
-
 <p>Test the freshly signed admin certificate by passing it in to the <code>curl</code> command we used earlier:</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">curl -s https://$CONTROLLER_PUBLIC_IP/api/v1/namespaces --cacert ~/.kube/ca.pem --cert ~/.kube/admin.pem --key ~/.kube/admin-key.pem
 </li></ul></code></pre>
@@ -2261,7 +2509,7 @@ Error flushing userspace chain: error flushing chain "KUBE-NODEPORT-CONTAINER": 
 
 <h3 id="download-kubectl">Download Kubectl</h3>
 
-<p>As highlighted in the [Step 4 — Understanding Where To Get The Kubernetes Artifacts](#) section of this tutorial, the <code>kubectl</code> binary can be downloaded from the Google cloud storage bucket.</p>
+<p>As highlighted in [Step 5 — Downloading The Kubernetes Artifacts](#) of this tutorial, the <code>kubectl</code> binary can be downloaded from the Google cloud storage bucket.</p>
 
 <p>For 64bit Linux clients:</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">sudo curl -Lo /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.1.2/bin/linux/amd64/kubectl
@@ -2278,7 +2526,6 @@ Error flushing userspace chain: error flushing chain "KUBE-NODEPORT-CONTAINER": 
 
 <h3 id="introduction-to-kubeconfig-files">Introduction to Kubeconfig files</h3>
 
-<p>&lt;!-- Environment variables to manage the environments, who would have thought... --&gt;<br>
 Several tools, Docker for example, rely on command-line flags and environment variables to configure the environment:</p>
 <div class="code-label " title="docker environment variables">docker environment variables</div><pre class="code-pre "><code langs="">DOCKER_HOST=tcp://192.168.99.101:2376
 DOCKER_CERT_PATH=/home/demo/.docker/machines/.client
@@ -2303,8 +2550,6 @@ DOCKER_MACHINE_NAME=dev
 
 <p>Decoupling users from clusters provides the ability to define cross cluster users only once. A <code>user</code> entry and a <code>cluster</code> entry combine to make up a <code>context</code>. Several such (<code>cluster</code>, <code>user</code>) pairs are then defined in a third associative array of <code>name-&gt;context</code> entries. Context entries also provide a <code>namespace</code> field to specify the Kubernetes <code>namespace</code> to be used for that context.  The <code>current-context</code> may be set to define the context in use.</p>
 
-<p>&lt;!-- contexts are more than a pair (2-tuple), they are a 3-tuple as they consist of user, context and namespace --&gt;</p>
-
 <p>To declare the above components, kubeconfig files are written in YAML and similar to Pod manifests start with a versioned schema definition:</p>
 <pre class="code-pre "><code langs="">apiVersion: v1
 kind: Config
@@ -2328,8 +2573,8 @@ clusters:
     certificate-authority: <span class="highlight">ca.pem</span>
     server: https://$CONTROLLER_PUBLIC_IP
 </code></pre>
-<p>[note]<br>
-<strong>Note</strong>: Relative paths are supported, in this tutorial we store our certificates in the same directory as our kubeconfig file (<code>~/.kube/</code>), modify these values to mirror your own configuration.<br>
+<p><span class="note">
+<strong>Note</strong>: Relative paths are supported, in this tutorial we store our certificates in the same directory as our kubeconfig file (<code>~/.kube/</code>), modify these values to mirror your own configuration.</span>
 </p>
 
 <p>Next, we define the <code>admin</code> user and specify the associated TLS assets we generated for certification based authentication:</p>
@@ -2414,7 +2659,7 @@ kube-scheduler-188.166.252.4              1/1       Running   0          3h
 </li></ul></code></pre>
 <p>Returns an empty collection of worker nodes. We will spin up our first worker node next.</p>
 
-<h2 id="step-9-—-provisioning-the-kubernetes-worker-droplets">Step 9 — Provisioning The Kubernetes Worker Droplets</h2>
+<h2 id="step-10-—-provisioning-the-kubernetes-worker-droplets">Step 10 — Provisioning The Kubernetes Worker Droplets</h2>
 
 <p>Configuring the workers is significantly less complicated and we can reuse many of the controllers configuration.</p>
 
@@ -2725,15 +2970,9 @@ coreos:
 </li><li class="line" prefix="$"> -extensions v3_req \
 </li><li class="line" prefix="$"> -extfile worker-openssl.cnf
 </li></ul></code></pre>
-<p>&lt;!-- </p>
 
-<p>We no longer need the csr</p>
-<pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">rm worker-01.csr
-</li></ul></code></pre>
-<p>--&gt;<br>
-[note]<br>
-<strong>Note</strong>: the above command does not work on <code>git-for-windows</code> due to windows path conversions, it is recommended to copy the <code>worker-01.csr</code> and <code>worker-openssl.cnf</code> to <code>~/.kube/</code> and just run the command from within the <code>~/.kube/</code> directory (without the <code>"$HOME/.kube/"</code> parts)<br>
-</p>
+<p><span class="note"><strong>Note</strong>: the above command does not work on <code>git-for-windows</code> due to windows path conversions, it is recommended to copy the <code>worker-01.csr</code> and <code>worker-openssl.cnf</code> to <code>~/.kube/</code> and just run the command from within the <code>~/.kube/</code> directory (without the <code>"$HOME/.kube/"</code> parts)<br>
+</span></p>
 
 <p>Copy the necessary certificates to the controller node. We store the files in the home directory first.</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">scp ~/.kube/worker-01-key.pem ~/.kube/worker-01.pem ~/.kube/ca.pem core@$WORKER_PUBLIC_IP:~
@@ -2759,7 +2998,7 @@ coreos:
 </code></pre>
 <p>We may repeat the above steps to create additional Worker droplets with their own TLS assets. We now have a working Kubernetes cluster, ready to start running our containerized applications. To facilitate the application deployment however, we are recommended to run a few cluster services and will proceed to do so in the next step.</p>
 
-<h2 id="step-10-—-running-kubernetes-cluster-services">Step 10 — Running Kubernetes Cluster Services</h2>
+<h2 id="step-11-—-running-kubernetes-cluster-services">Step 11 — Running Kubernetes Cluster Services</h2>
 
 <p>Several cluster services are provided as cluster add-ons (UI/Dashboard, Image Registry, DNS, ...). Deploying these add-ons is optional, but availability of some of these services is often expected by Kubernetes users. A full listing of all supported add-ons can be found within the Kubernetes GitHub repository at <a href="https://github.com/kubernetes/kubernetes/tree/release-1.1/cluster/addons" rel="nofollow">kubernetes/cluster/addons/</a>. </p>
 
@@ -2807,9 +3046,6 @@ metadata:
 
 <p>At the time of writing we are using version 9 and refer to the DNS add-on as the <code>kube-dns</code> app. By default Replication Controllers will run 1 replica, but we explicitly set the <code>replicas</code> field to 1 for clarity in our <code>spec</code>. This looks as follows in our manifest file:</p>
 
-<p>&lt;!--<br>
-<strong>note:</strong> <a href="https://github.com/kubernetes/kubernetes/commit/5abfce45e1fb0cb9bf3b643f0ee53b812e6f83b0" rel="nofollow">update to v10?</a><br>
---&gt;</p>
 <div class="code-label " title="DNS Add-on Manifest - snippet">DNS Add-on Manifest - snippet</div><pre class="code-pre "><code langs="">apiVersion: v1
 kind: ReplicationController
 metadata:
@@ -2895,7 +3131,7 @@ spec:
 </code></pre>
 <p>The Kube2sky Docker image has the <code>Entrypoint</code> set to <code>/kube2sky</code>, thus we only need to pass on the <code>-domain</code> under which we want all DNS names to be hosted through the <code>args</code> array. This should match our kubelet configuration which we set to <code>cluster.local</code> in this tutorial, modify this value to mirror your own configuration.</p>
 
-<p>Kube2sky discovers and authenticates with the Kubernetes API Service through environment variables provisioned and secrets mounted by the kubelet into the container, we will have a closer look at these in [Step 11 — Deploying Kubernetes-ready applications](#). Once authenticated and connected, Kube2sky watches the Kubernetes API Service for changes in Service objects and publishes those changes to Etcd for SkyDNS. SkyDNS supports A and AAAA records to handle "legacy" services. With A/AAAA records the port number must be known by the client connection because that information is not in the returned records. Given we defined our cluster domain as <code>cluster.local</code>, the keys created by Kube2sky and served by SkyDNS will have the following DNS naming scheme:</p>
+<p>Kube2sky discovers and authenticates with the Kubernetes API Service through environment variables provisioned and secrets mounted by the kubelet into the container, we will have a closer look at these in [Step 12 — Running Kubernetes Cluster Services](#). Once authenticated and connected, Kube2sky watches the Kubernetes API Service for changes in Service objects and publishes those changes to Etcd for SkyDNS. SkyDNS supports A and AAAA records to handle "legacy" services. With A/AAAA records the port number must be known by the client connection because that information is not in the returned records. Given we defined our cluster domain as <code>cluster.local</code>, the keys created by Kube2sky and served by SkyDNS will have the following DNS naming scheme:</p>
 <div class="code-label " title="A Records naming scheme">A Records naming scheme</div><pre class="code-pre "><code langs="">&lt;service_name&gt;.&lt;namespace_name&gt;.svc.<span class="highlight">cluster.local</span>
 </code></pre>
 <p>For example: for a Service called "my-service" in the "default" namespace, an A record for <code>my-service.default.svc.cluster.local</code> is created. Other Pods within the same <code>default</code> namespace should be able to find the service simply by doing a name lookup for <code>my-service</code>, Pods which exist in other namespaces must use the fully qualified name.</p>
@@ -3110,8 +3346,8 @@ spec:
 </li></ul></code></pre>
 <p>In our Service object metadata we attach the same <code>k8s-app</code> label as our Pods and Replication Controller as well as the necessary labels for Kubernetes add-on services. In our <a href="http://kubernetes.io/v1.1/docs/api-reference/v1/definitions.html#_v1_servicespec" rel="nofollow">ServiceSpec</a> our selector, used to route traffic to Pods with matching labels, only specifies the <code>k8s-app</code> label. This does not specify the version, allowing us to do rolling updates of our DNS add-on in the future, see the <a href="http://kubernetes.io/v1.1/docs/user-guide/update-demo/README.html" rel="nofollow">Rolling Update Example</a> for more details. Finally, we also define named ports for the DNS service on both TCP and UDP protocols. We will later confirm SRV records exist for these named ports of the <code>kube-dns</code> service in the <code>kube-system</code> namespace itself.</p>
 
-<p><br>
-<strong>Note</strong>: Multiple yaml documents can be concatenated with the <code>---</code> separator. We may simplify management of multiple resources by grouping them together in the same file separated by <code>---</code>, we may just specify multiple resources through multiple <code>-f</code> arguments for the <code>kubectl create</code> command. See the official <a href="http://kubernetes.io/v1.1/docs/user-guide/managing-deployments.html#organizing-resource-configurations" rel="nofollow">Managing Deployments Guide</a><br></p>
+<p><br><span class="note">
+<strong>Note</strong>: Multiple yaml documents can be concatenated with the <code>---</code> separator. We may simplify management of multiple resources by grouping them together in the same file separated by <code>---</code>, we may just specify multiple resources through multiple <code>-f</code> arguments for the <code>kubectl create</code> command. See the official <a href="http://kubernetes.io/v1.1/docs/user-guide/managing-deployments.html#organizing-resource-configurations" rel="nofollow">Managing Deployments Guide</a><br></span></p>
 
 <p>The resources will be created in the order they appear in the file. Therefore, it's best to specify the service first, since that will ensure the scheduler can spread the pods associated with the service as they are created by the replication controller(s).</p>
 
@@ -3169,11 +3405,11 @@ Address 1: 10.3.0.1
 <p>We specify the container we want to execute commands in through the <code>-c</code> option of the <code>kubectl exec</code> command. </p>
 
 <p>Use <code>dig</code> to query the SRV record for the port named dns using the UDP protocol and <code>sed</code> to only print the response from the <code>ANSWER SECTION</code> to the <code>Query Time</code> lines:</p>
+
+<p>&lt;!-- use dig SRV my.url.test +nostats +nocomments +nocmd instead! --&gt;</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">dig <a href="https://www.digitalocean.com/community/users/localhost" class="username-tag">@localhost</a> SRV _dns._udp.kube-dns.kube-system.svc.cluster.local | sed -n '/ANSWER SECTION:/,/Query time/ p'
 </li></ul></code></pre>
 <p>We are using <code>sed</code> with the <code>-n</code> option to suppress all output, we specify a range of regular expression patterns (<code>/ANSWER SECTION/,/Query time/</code>) and instruct <code>sed</code> to print only lines within this range with the <code>p</code> command</p>
-
-<p>&lt;!-- use <code>dig SRV my.url.test +nostats +nocomments +nocmd</code>  instead --&gt;</p>
 
 <p>The expected output should look as follows:</p>
 <pre class="code-pre "><code langs=""><div class="secondary-code-label " title="Output">Output</div>;; ANSWER SECTION:
@@ -3188,7 +3424,7 @@ kube-dns.kube-system.svc.cluster.local. 30 IN A <span class="highlight">10.3.0.1
 
 <p>Refer also to the <a href="http://kubernetes.io/v1.1/docs/admin/dns.html" rel="nofollow">Official DNS Integration documentation</a> and the <a href="https://github.com/kubernetes/kubernetes/tree/release-1.1/cluster/addons/dns" rel="nofollow">DNS Add-on repository</a>.</p>
 
-<h2 id="step-11-—-deploying-kubernetes-ready-applications">Step 11 — Deploying Kubernetes-ready applications</h2>
+<h2 id="step-12-—-deploying-kubernetes-ready-applications">Step 12 — Deploying Kubernetes-ready applications</h2>
 
 <p>You should now have a Kubernetes cluster set up and be able to deploy Kubernetes-ready applications. </p>
 
@@ -3260,9 +3496,11 @@ replicationcontroller "inspector-stable" created&lt;^&gt;
 
 <h2 id="deleting-your-kubernetes-cluster">Deleting your Kubernetes Cluster</h2>
 
+<p>&lt;!-- probably won't include this section in the final tutorial...? --&gt;</p>
+
 <p>If you decide you do no longer want to run this cluster (or want to start from scratch), below are the commands to do so:</p>
 
-<p><strong>NOTE</strong> These commands destroy your cluster and all the data contained within without any backups, these commands are irreversible.</p>
+<p><span class="note"><strong>NOTE</strong> These commands destroy your cluster and all the data contained within without any backups, these commands are irreversible.</span></p>
 
 <p>Repeat for every controller</p>
 <pre class="code-pre "><code langs=""><ul class="prefixed"><li class="line" prefix="$">doctl d d kube-controller-01.$region
