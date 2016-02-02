@@ -9,8 +9,81 @@
     <managingEditor>vincent.drl@gmail.com (Vincent De Smet)</managingEditor>
     <webMaster>vincent.drl@gmail.com (Vincent De Smet)</webMaster>
     <copyright>Copyright (c) 2015. All rights reserved.</copyright>
-    <lastBuildDate>Wed, 13 Jan 2016 09:35:36 +0700</lastBuildDate>
+    <lastBuildDate>Wed, 13 Jan 2016 12:56:56 +0700</lastBuildDate>
     <atom:link href="http://so0k.github.io/tags/hyper-v/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>How to Kill a Hanging Hyper-V VM</title>
+      <link>http://so0k.github.io/2016/01/13/how-to-kill-a-hanging-hyper-v-vm/</link>
+      <pubDate>Wed, 13 Jan 2016 12:56:56 +0700</pubDate>
+      <author>vincent.drl@gmail.com (Vincent De Smet)</author>
+      <guid>http://so0k.github.io/2016/01/13/how-to-kill-a-hanging-hyper-v-vm/</guid>
+      <description>
+
+&lt;p&gt;After boasting how fast I got a NodeJS container to do play with some npm packages, as seen in my previous post, I crashed the Hyper-V VM I was using&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;I accidentally disconnected the external hard disk from which the CoreOS VM was running (due to an ageing USB cable) and I could no longer shut it down. Asking Hyper-V to turn of the power didn&amp;rsquo;t work also. The &lt;a href=&#34;https://technet.microsoft.com/en-us/library/hh848468.aspx&#34;&gt;&lt;code&gt;Stop-VM&lt;/code&gt;&lt;/a&gt; cmdlet was quite useless.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Stop-VM -Force
+#hanging...#
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This was not the first time I faced this issue, but I couldn&amp;rsquo;t find my notes on how I fixed it last time (I remember it was possible to get the ProcessId from a Hyper-V VM and just kill the process, should be simple&amp;hellip;), time to properly jot it down this time for future reference&amp;hellip;&lt;/p&gt;
+
+&lt;h2 id=&#34;solution:1f197efabed05d8c95ecc233ef878914&#34;&gt;Solution&lt;/h2&gt;
+
+&lt;p&gt;I started by looking at the Properties exposed by the &lt;code&gt;Microsoft.HyperV.PowerShell.VirtualMachine&lt;/code&gt; object returned from the &lt;code&gt;Get-VM&lt;/code&gt; cmdlet. Use the &lt;code&gt;Get-Member&lt;/code&gt; cmdlet for this (or the &lt;code&gt;GM&lt;/code&gt; alias) and filter for things such as &amp;laquo;Process&amp;raquo; and &amp;laquo;Id&amp;raquo; (still falling back to old command tools such as &lt;code&gt;findstr&lt;/code&gt; out of habit&amp;hellip;)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-PowerShell&#34;&gt;Get-VM | GM | findstr /I &amp;quot;id&amp;quot;
+Get-VM | GM | findstr /I &amp;quot;proc&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Didn&amp;rsquo;t return what I was looking for&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;Having a look at the Name and Id property gave me this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Get-VM | ft Id, Name
+Id                                   Name
+--                                   ----
+3b5532af-93ae-4aa5-86e3-474a9e3638a0 coreos2
+5c46b6d3-d4c5-4cfb-8587-84bbdeb3158a Win2k12-Sql2k12-Sun442
+d591db38-0cce-474c-99be-d076b312c553 Win2k3-SQL2008R2-Sun433
+ea0c01ad-8c66-4f84-99f4-df80e40ef3da Win2k8-Ora11.2-Sun44
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I did have to resort to Google and it turns out Hyper-V uses this Id when starting the VM Worker Process (&lt;code&gt;vmwp&lt;/code&gt;), a TaskList showing the CommandLine will tell you that clearly:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Get-WmiObject win32_process -Filter &amp;quot;name like &#39;%vmwp%&#39;&amp;quot; | select CreationDate,ProcessId,CommandLine | ft -AutoSize
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;rsquo;s all I needed to know to kill the VM&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Stop-Process 13432
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It&amp;rsquo;s always easier if you let the computer do the matching for you, &lt;a href=&#34;http://vniklas.djungeln.se/2013/01/30/find-correlation-between-vmwp-process-and-vm-in-hyper-v-2012/&#34;&gt;This blog post shows you how&lt;/a&gt;, break tis down as follows:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Get the VM Id parsed out of the CommandLine by splitting on the space and returning the 2nd element in the array (0-based indexing):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Get-WmiObject win32_process -Filter &amp;quot;name like &#39;%vmwp%&#39;&amp;quot; | select {$_.CommandLine.split(&amp;quot; &amp;quot;)[1] }
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Use a Dictionary object to assign a proper name to the property:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Get-WmiObject win32_process -Filter &amp;quot;name like &#39;%vmwp%&#39;&amp;quot; | select ProcessId, @{Label=&amp;quot;VM.Id&amp;quot;;Expression={$_.CommandLine.split(&amp;quot; &amp;quot;)[1]}}
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Pass this GUID to the &lt;code&gt;Get-VM&lt;/code&gt; cmdlet and return the &lt;code&gt;Name&lt;/code&gt; property from the &lt;code&gt;Microsoft.HyperV.PowerShell.VirtualMachine&lt;/code&gt; Object associated with each running &lt;code&gt;vmwp&lt;/code&gt; Process:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Get-WmiObject Win32_Process -Filter &amp;quot;Name like &#39;%vmwp%&#39;&amp;quot; | select ProcessId, `
+@{Label=&amp;quot;VM.Name&amp;quot;;Expression={(Get-VM -Id $_.Commandline.split(&amp;quot; &amp;quot;)[1]).Name}}
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Hyper-V restarted the VM as soon as its worker process died, but this time it was responding properly&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>How to quickly get an up to date looking resume</title>
@@ -101,7 +174,7 @@ export SMB_SHARE=prj
 export SMB_USER=my.username
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Run the script, you will be prompted for you password:&lt;/p&gt;
+&lt;p&gt;Run the script, you will be prompted for your password:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;./mounthost
 &lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;

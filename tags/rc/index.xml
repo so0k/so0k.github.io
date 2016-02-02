@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Rc on Guides and Notes by Vincent</title>
+    <link>http://so0k.github.io/tags/rc/</link>
+    <description>Recent content in Rc on Guides and Notes by Vincent</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>vincent.drl@gmail.com (Vincent De Smet)</managingEditor>
+    <webMaster>vincent.drl@gmail.com (Vincent De Smet)</webMaster>
+    <copyright>Copyright (c) 2015. All rights reserved.</copyright>
+    <lastBuildDate>Thu, 21 Jan 2016 12:52:58 +0700</lastBuildDate>
+    <atom:link href="http://so0k.github.io/tags/rc/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Docker v1.10</title>
+      <link>http://so0k.github.io/2016/01/21/docker-v1.10/</link>
+      <pubDate>Thu, 21 Jan 2016 12:52:58 +0700</pubDate>
+      <author>vincent.drl@gmail.com (Vincent De Smet)</author>
+      <guid>http://so0k.github.io/2016/01/21/docker-v1.10/</guid>
+      <description>
+
+&lt;p&gt;&lt;strong&gt;Docker 1.10 is coming&lt;/strong&gt; and as with any release in the ever fast moving world of Docker, it is good to find out more about the use cases for the newly introduced commands, below is a list of the interesting changes that stood out for me so far:&lt;/p&gt;
+
+&lt;h3 id=&#34;container-mutability-and-the-new-docker-update-command:61aa534034babfc14972e5e817552dee&#34;&gt;Container Mutability and the new &lt;code&gt;docker update&lt;/code&gt; command&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/docker/docker/pull/15078&#34;&gt;Relevant pull request&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Usage: docker update [OPTIONS] CONTAINER [CONTAINER...]
+
+Updates container resource limits
+
+  --blkio-weight=0           Block IO (relative weight), between 10 and 1000
+  --cpu-shares=0             CPU shares (relative weight)
+  --cpu-period=0             Limit the CPU CFS (Completely Fair Scheduler) period
+  --cpu-quota=0              Limit the CPU CFS (Completely Fair Scheduler) quota
+  --cpuset-cpus=&amp;quot;&amp;quot;           CPUs in which to allow execution (0-3, 0,1)
+  --cpuset-mems=&amp;quot;&amp;quot;           Memory nodes (MEMs) in which to allow execution (0-3, 0,1)
+  -m, --memory=&amp;quot;&amp;quot;            Memory limit
+  --memory-reservation=&amp;quot;&amp;quot;    Memory soft limit
+  --memory-swap=&amp;quot;&amp;quot;           Total memory (memory + swap), &#39;-1&#39; to disable swap
+  --kernel-memory=&amp;quot;&amp;quot;         Kernel memory limit: container must be stopped
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The docker update command dynamically updates container resources. Use this command to prevent containers from consuming too many resources from their Docker host. With a single command, you can place limits on a single container or on many. To specify more than one container, provide space-separated list of container names or IDs.&lt;/p&gt;
+
+&lt;p&gt;With the exception of the &lt;code&gt;--kernel-memory&lt;/code&gt; value, you can specify these options on a running or a stopped container. You can only update &lt;code&gt;--kernel-memory&lt;/code&gt; on a stopped container. When you run docker update on stopped container, the next time you restart it, the container uses those values.&lt;/p&gt;
+
+&lt;p&gt;Prior to 1.10, once the Docker Daemon created a container for the Image you chose to run, it did not give you an easy way to change the configuration you specified with the &lt;code&gt;docker run&lt;/code&gt; command.&lt;/p&gt;
+
+&lt;p&gt;From a technical perspective, Docker exposes a layer above a set of technologies (cgroups, namespaces, iptables, filesystems, &amp;hellip;) to provide its users an easy way of managing these resources for their applications. One could always dig into these layers to make adjustments behind the daemons&amp;rsquo; back.&lt;/p&gt;
+
+&lt;p&gt;For example:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://stackoverflow.com/questions/19897743/exposing-a-port-on-a-live-docker-container&#34;&gt;Exposing ports on a live container&lt;/a&gt;:&lt;/p&gt;
+
+&lt;p&gt;This Stack Overflow question gives us this very usefull snippet&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#get the container IP
+CONTAINER_IP=$(docker inspect -f &#39;{{ .NetworkSettings.IPAddress }}&#39; container_name)
+#forward packets from port 8001 on your host to port 8000 on the container
+iptables -t nat -A DOCKER -p tcp --dport 8001 -j DNAT --to-destination ${CONTAINER_IP}:8000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://superuser.com/questions/803772/remove-exposed-port-from-docker/808124&#34;&gt;See Also&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://goldmann.pl/blog/2014/09/11/resource-management-in-docker/&#34;&gt;Managing Docker resources with Cgroups&lt;/a&gt; (September 2014)&lt;/p&gt;
+
+&lt;p&gt;Either by interacting with &lt;code&gt;cgroups&lt;/code&gt; directly or if running Docker with Systemd, using &lt;code&gt;systemctl&lt;/code&gt; to set properties on the systemd scope of the container, also refer to the &lt;a href=&#34;https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Resource_Management_Guide/&#34;&gt;Redhat Resource Management Guide&lt;/a&gt; &amp;amp; &lt;a href=&#34;http://www.freedesktop.org/software/systemd/man/systemd.resource-control.html&#34;&gt;systemd resource control&lt;/a&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo systemctl set-property docker-4be96b853089bc6044b29cb873cac460b429cfcbdd0e877c0868eb2a901dbf80.scope CPUShares=512
+#show all the properties:
+systemctl show docker-4be96b853089bc6044b29cb873cac460b429cfcbdd0e877c0868eb2a901dbf80.scope
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://jpetazzo.github.io/2015/01/13/docker-mount-dynamic-volumes/&#34;&gt;Attaching Volumes to a running container&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&amp;hellip;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;But going behind the back of the Docker Daemon does not provide any logs or audit trails and may cause unexpected side effects, moreover - giving users the ability apply these changes through the Docker API only makes sense given it is possible to achieve underneath&amp;hellip; but up to what point?&lt;/p&gt;
+
+&lt;p&gt;This brings us to a very important question: &lt;strong&gt;How much of a container should be mutable?&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;With Docker 1.9, networks could be &lt;a href=&#34;https://docs.docker.com/engine/reference/commandline/network_connect/&#34;&gt;connected &amp;amp; disconnected&lt;/a&gt; from a Container and containers could be &lt;a href=&#34;https://docs.docker.com/engine/reference/commandline/rename/&#34;&gt;renamed&lt;/a&gt; while all other aspects are immutable from the Docker daemon&amp;rsquo;s perspective.&lt;/p&gt;
+
+&lt;p&gt;With the addition of the &lt;a href=&#34;https://github.com/docker/docker/blob/v1.10.0-rc1/docs/reference/commandline/update.md&#34;&gt;&lt;code&gt;docker update&lt;/code&gt;&lt;/a&gt; command in 1.10, CPU/Memory resources can be changed dynamically (except the &lt;code&gt;--kernel-memory&lt;/code&gt; setting which requires a container restart) and are persisted in the container definition to ensure they still apply after restarts.&lt;/p&gt;
+
+&lt;p&gt;Adding support for exposing ports, changing container restart policies and &lt;a href=&#34;https://github.com/docker/docker/pull/18958&#34;&gt;labels&lt;/a&gt; are being worked on , but do not seem to be planned for the 1.10 release, but what about &lt;code&gt;Environment variables&lt;/code&gt;?&lt;/p&gt;
+
+&lt;h3 id=&#34;container-network-model-service-discovery:61aa534034babfc14972e5e817552dee&#34;&gt;Container Network Model - Service Discovery&lt;/h3&gt;
+
+&lt;p&gt;With the 1.9 release, Docker moved its networking libraries from the experimental branch to the production ready branch. Networking brought a big change in the way containers find each other, deprecating Docker links as well as adding cross-host support with overlay (vxlan) networks (replacing the ambassador container pattern).&lt;/p&gt;
+
+&lt;p&gt;Docker links worked by modifying the &lt;code&gt;/etc/hosts&lt;/code&gt; files within the containers, bypassing DNS lookups. The new networking model built further on this approach to provide cluster wide service discovery. Unfortunately, making changes to a shared resource (&lt;code&gt;/etc/hosts&lt;/code&gt;) in a non-atomic way and scaling &lt;a href=&#34;https://github.com/docker/docker/issues/17190&#34;&gt;will never go hand in hand&lt;/a&gt;. The service discovery model was in desperate need for a change.&lt;/p&gt;
+
+&lt;p&gt;As highlighted by Ahmet Alp Balkan in his &lt;a href=&#34;https://youtu.be/WXESsPqC8to&#34;&gt;excellent DockerCon EU 2015 presentation&lt;/a&gt;, most Service Discovery solutions gravitate towards the tested and proven DNS protocol. Some of the drawbacks highlighted such as IP caching and no respect for TLS are solved by Cluster Management Systems such as Kubernetes by fully decoupling the service endpoint from the implementation through labels and fixed IP service resources.&lt;/p&gt;
+
+&lt;p&gt;The fix by the Docker networking team for 1.10 would be to &lt;a href=&#34;https://github.com/docker/docker/issues/17195&#34;&gt;bundle a DNS server with the Docker Daemon&lt;/a&gt; and expose this service within the namespace of every container. This would certainly be a much better solution than the current one, but the fact that &lt;strong&gt;neither the previous &lt;code&gt;/etc/hosts&lt;/code&gt; nor the upcoming DNS server are &lt;em&gt;optional&lt;/em&gt;&lt;/strong&gt; is still &lt;a href=&#34;http://blog.kubernetes.io/2016/01/why-Kubernetes-doesnt-use-libnetwork.html&#34;&gt;not making some people happy&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

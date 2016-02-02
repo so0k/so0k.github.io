@@ -101,7 +101,7 @@ export SMB_SHARE=prj
 export SMB_USER=my.username
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Run the script, you will be prompted for you password:&lt;/p&gt;
+&lt;p&gt;Run the script, you will be prompted for your password:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;./mounthost
 &lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
