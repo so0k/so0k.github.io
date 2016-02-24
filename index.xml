@@ -9,8 +9,139 @@
     <managingEditor>vincent.drl@gmail.com (Vincent De Smet)</managingEditor>
     <webMaster>vincent.drl@gmail.com (Vincent De Smet)</webMaster>
     <copyright>Copyright (c) 2015. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 21 Jan 2016 12:52:58 +0700</lastBuildDate>
+    <lastBuildDate>Wed, 24 Feb 2016 17:10:02 +0700</lastBuildDate>
     <atom:link href="http://so0k.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>How to quickly group FlatFile records and get a grouped Field maximum</title>
+      <link>http://so0k.github.io/2016/02/24/how-to-quickly-group-flatfile-records-and-get-a-grouped-field-maximum/</link>
+      <pubDate>Wed, 24 Feb 2016 17:10:02 +0700</pubDate>
+      <author>vincent.drl@gmail.com (Vincent De Smet)</author>
+      <guid>http://so0k.github.io/2016/02/24/how-to-quickly-group-flatfile-records-and-get-a-grouped-field-maximum/</guid>
+      <description>&lt;p&gt;If the data was in a RDBMS you&amp;rsquo;d simply &lt;code&gt;GROUP BY Field1&lt;/code&gt; and &lt;code&gt;SELECT MAX(Field2)&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;However, all I got are: FlatFiles, little time and PowerShell, so Let&amp;rsquo;s GO!&lt;/p&gt;
+
+&lt;p&gt;First, I have to filter down records in the file based on the first 3 characters of each line, only &lt;code&gt;ANV&lt;/code&gt; records were of interest to me, let me load these records in memory real fast:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ANV=gc SSRF-FAH.BAK | ? { $_.substring(0,3) -eq &amp;quot;ANV&amp;quot; }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Great, let&amp;rsquo;s have a look at what the first few records we just loaded look like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ANV | Select -First 10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Which gives me:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ANVA182007                                                                   20130425...
+ANVA182600                                                                   20120829...
+ANVA182607                                                                   20130425...
+ANVA188001                                                                   20120829...
+ANVA188010                                                                   20120829...
+ANVA188011                                                                   20120829...
+ANVA188012                                                                   20120829...
+ANVA188014                                                                   20120829...
+ANVA188016                                                                   20120829...
+ANVA190000                                                                   20120829...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I only care about the first 20 characters and only the last 2 record fields listed below:&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Field&lt;/th&gt;
+&lt;th&gt;Start&lt;/th&gt;
+&lt;th&gt;Length&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;RecordType&lt;/td&gt;
+&lt;td&gt;00&lt;/td&gt;
+&lt;td&gt;03&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;Category&lt;/td&gt;
+&lt;td&gt;03&lt;/td&gt;
+&lt;td&gt;02&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;Code&lt;/td&gt;
+&lt;td&gt;05&lt;/td&gt;
+&lt;td&gt;15&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create some custom properties to display this data&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ANV | Select `
+@{Name=&amp;quot;Category&amp;quot;;Expression={$_.Substring(3,2)}}, `
+@{Name=&amp;quot;Code&amp;quot;;Expression={$_.Substring(5,15)}} `
+| Select -First 10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I actually only want the length of the codes, so this becomes:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; $ANV | Select `
+ @{Name=&amp;quot;Category&amp;quot;;Expression={$_.Substring(3,2)}}, `
+ @{Name=&amp;quot;CodeLength&amp;quot;;Expression={$_.Substring(5,15).trim().Length}} `
+ | Select -First 10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now let&amp;rsquo;s group by &lt;code&gt;Category&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ANV | Select `
+@{Name=&amp;quot;Category&amp;quot;;Expression={$_.Substring(3,2)}}, `
+@{Name=&amp;quot;CodeLength&amp;quot;;Expression={$_.Substring(5,15).trim().Length}} | `
+Group Category | Select -First 10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This gives us the following&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Count Name                      Group
+----- ----                      -----
+   16 A1                        {@{Category=A1; CodeLength=5}, @{Category=A1; Code...}}
+   13 A3                        {@{Category=A3; CodeLength=4}, @{Category=A3; Code...}}
+  530 A4                        {@{Category=A4; CodeLength=1}, @{Category=A4; Code...}}
+  351 A6                        {@{Category=A6; CodeLength=4}, @{Category=A6; Code...}}
+    1 A7                        {@{Category=A7; CodeLength=5}}
+    3 C4                        {@{Category=C4; CodeLength=1}, @{Category=C4; Code...}}
+  216 I1                        {@{Category=I1; CodeLength=3}, @{Category=I1; Code...}}
+    3 I3                        {@{Category=I3; CodeLength=1}, @{Category=I3; Code...}}
+    8 I4                        {@{Category=I4; CodeLength=2}, @{Category=I4; Code...}}
+   40 M0                        {@{Category=M0; CodeLength=4}, @{Category=M0; Code...}}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Great, only thing left to do is get the maximum &lt;code&gt;CodeLength&lt;/code&gt; per &lt;code&gt;Category&lt;/code&gt;&amp;hellip; most Google results tell you to sort and select the first:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ANV | Select `
+@{Name=&amp;quot;Category&amp;quot;;Expression={$_.Substring(3,2)}}, `
+@{Name=&amp;quot;CodeLength&amp;quot;;Expression={$_.Substring(5,15).trim().Length}} | `
+Group Category | %{ $_.Group | Sort CodeLength -Descending | Select -First 1 }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Exactly what I needed:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Category CodeLength
+-------- ----------
+A1                5
+A3                4
+A4                9
+A6                5
+A7                5
+C4                1
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now back to the boring parts :(&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Docker v1.10</title>
@@ -22,7 +153,7 @@
 
 &lt;p&gt;&lt;strong&gt;Docker 1.10 is coming&lt;/strong&gt; and as with any release in the ever fast moving world of Docker, it is good to find out more about the use cases for the newly introduced commands, below is a list of the interesting changes that stood out for me so far:&lt;/p&gt;
 
-&lt;h3 id=&#34;container-mutability-and-the-new-docker-update-command:61aa534034babfc14972e5e817552dee&#34;&gt;Container Mutability and the new &lt;code&gt;docker update&lt;/code&gt; command&lt;/h3&gt;
+&lt;h3 id=&#34;container-mutability-and-the-new-docker-update-command&#34;&gt;Container Mutability and the new &lt;code&gt;docker update&lt;/code&gt; command&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://github.com/docker/docker/pull/15078&#34;&gt;Relevant pull request&lt;/a&gt;&lt;/p&gt;
 
@@ -89,7 +220,7 @@ systemctl show docker-4be96b853089bc6044b29cb873cac460b429cfcbdd0e877c0868eb2a90
 
 &lt;p&gt;Adding support for exposing ports, changing container restart policies and &lt;a href=&#34;https://github.com/docker/docker/pull/18958&#34;&gt;labels&lt;/a&gt; are being worked on , but do not seem to be planned for the 1.10 release, but what about &lt;code&gt;Environment variables&lt;/code&gt;?&lt;/p&gt;
 
-&lt;h3 id=&#34;container-network-model-service-discovery:61aa534034babfc14972e5e817552dee&#34;&gt;Container Network Model - Service Discovery&lt;/h3&gt;
+&lt;h3 id=&#34;container-network-model-service-discovery&#34;&gt;Container Network Model - Service Discovery&lt;/h3&gt;
 
 &lt;p&gt;With the 1.9 release, Docker moved its networking libraries from the experimental branch to the production ready branch. Networking brought a big change in the way containers find each other, deprecating Docker links as well as adding cross-host support with overlay (vxlan) networks (replacing the ambassador container pattern).&lt;/p&gt;
 
@@ -119,7 +250,7 @@ systemctl show docker-4be96b853089bc6044b29cb873cac460b429cfcbdd0e877c0868eb2a90
 
 &lt;p&gt;This was not the first time I faced this issue, but I couldn&amp;rsquo;t find my notes on how I fixed it last time (I remember it was possible to get the ProcessId from a Hyper-V VM and just kill the process, should be simple&amp;hellip;), time to properly jot it down this time for future reference&amp;hellip;&lt;/p&gt;
 
-&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
+&lt;h2 id=&#34;solution:1f197efabed05d8c95ecc233ef878914&#34;&gt;Solution&lt;/h2&gt;
 
 &lt;p&gt;I started by looking at the Properties exposed by the &lt;code&gt;Microsoft.HyperV.PowerShell.VirtualMachine&lt;/code&gt; object returned from the &lt;code&gt;Get-VM&lt;/code&gt; cmdlet. Use the &lt;code&gt;Get-Member&lt;/code&gt; cmdlet for this (or the &lt;code&gt;GM&lt;/code&gt; alias) and filter for things such as &amp;laquo;Process&amp;raquo; and &amp;laquo;Id&amp;raquo; (still falling back to old command tools such as &lt;code&gt;findstr&lt;/code&gt; out of habit&amp;hellip;)&lt;/p&gt;
 
