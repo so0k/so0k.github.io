@@ -59,7 +59,7 @@
     },
     "datePublished": "2016-02-24",
     "description": "I had a flat file of records and needed to figure out the maximum length of a particular field after filtering and grouping the records, here\x27s how.",
-    "wordCount":  355 
+    "wordCount":  412 
   }
 </script>
 
@@ -187,7 +187,7 @@
     &middot; by Vincent De Smet
   
   &middot; Read in about 2 min
-  &middot; (355 Words)
+  &middot; (412 Words)
 </small>
 
 
@@ -274,7 +274,11 @@ ANVA190000                                                                   201
 | Select -First 10
 </code></pre>
 
-<p>I actually only want the length of the codes, so this becomes:</p>
+<blockquote>
+<p>Above we used HashTables (a data structure which stores Key-Value pairs). In PowerShell you write HashTables with the <code>@{&lt;key&gt;=&lt;value&gt;}</code> syntax. The <code>Select-Object</code> cmdlet accepts a HashTable with <code>Name</code> and <code>Expression</code> Fields to create custom (a.k.a calculated) properties.</p>
+</blockquote>
+
+<p>I actually only want the length of the codes, so getting the Length after trimming the field gives me the following snippet:</p>
 
 <pre><code> $ANV | Select `
  @{Name=&quot;Category&quot;;Expression={$_.Substring(3,2)}}, `
@@ -282,7 +286,7 @@ ANVA190000                                                                   201
  | Select -First 10
 </code></pre>
 
-<p>Now let&rsquo;s group by <code>Category</code>:</p>
+<p>Now let&rsquo;s group by the <code>Category</code> Field:</p>
 
 <pre><code>$ANV | Select `
 @{Name=&quot;Category&quot;;Expression={$_.Substring(3,2)}}, `
@@ -306,7 +310,7 @@ Group Category | Select -First 10
    40 M0                        {@{Category=M0; CodeLength=4}, @{Category=M0; Code...}}
 </code></pre>
 
-<p>Great, only thing left to do is get the maximum <code>CodeLength</code> per <code>Category</code>&hellip; most Google results tell you to sort and select the first:</p>
+<p>Great, only thing left to do is get the maximum <code>CodeLength</code> per <code>Category</code>&hellip; most Google results tell you to sort and select the first <code>ForEach</code> group. <code>%</code> is a shortcut for <code>ForEach</code>:</p>
 
 <pre><code>$ANV | Select `
 @{Name=&quot;Category&quot;;Expression={$_.Substring(3,2)}}, `
@@ -345,6 +349,12 @@ C4                1
         </li>
     
 
+    
+      <li class="next">
+        <a href="http://so0k.github.io/2016/03/10/kubecon-eu-2016/" title="Kubecon EU 2016">
+            Next <span aria-hidden="true">&rarr;</span>
+        </a>
+      </li>
     
     </ul> </nav>
   

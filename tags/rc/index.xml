@@ -22,7 +22,7 @@
 
 &lt;p&gt;&lt;strong&gt;Docker 1.10 is coming&lt;/strong&gt; and as with any release in the ever fast moving world of Docker, it is good to find out more about the use cases for the newly introduced commands, below is a list of the interesting changes that stood out for me so far:&lt;/p&gt;
 
-&lt;h3 id=&#34;container-mutability-and-the-new-docker-update-command&#34;&gt;Container Mutability and the new &lt;code&gt;docker update&lt;/code&gt; command&lt;/h3&gt;
+&lt;h3 id=&#34;container-mutability-and-the-new-docker-update-command:61aa534034babfc14972e5e817552dee&#34;&gt;Container Mutability and the new &lt;code&gt;docker update&lt;/code&gt; command&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://github.com/docker/docker/pull/15078&#34;&gt;Relevant pull request&lt;/a&gt;&lt;/p&gt;
 
@@ -89,7 +89,7 @@ systemctl show docker-4be96b853089bc6044b29cb873cac460b429cfcbdd0e877c0868eb2a90
 
 &lt;p&gt;Adding support for exposing ports, changing container restart policies and &lt;a href=&#34;https://github.com/docker/docker/pull/18958&#34;&gt;labels&lt;/a&gt; are being worked on , but do not seem to be planned for the 1.10 release, but what about &lt;code&gt;Environment variables&lt;/code&gt;?&lt;/p&gt;
 
-&lt;h3 id=&#34;container-network-model-service-discovery&#34;&gt;Container Network Model - Service Discovery&lt;/h3&gt;
+&lt;h3 id=&#34;container-network-model-service-discovery:61aa534034babfc14972e5e817552dee&#34;&gt;Container Network Model - Service Discovery&lt;/h3&gt;
 
 &lt;p&gt;With the 1.9 release, Docker moved its networking libraries from the experimental branch to the production ready branch. Networking brought a big change in the way containers find each other, deprecating Docker links as well as adding cross-host support with overlay (vxlan) networks (replacing the ambassador container pattern).&lt;/p&gt;
 

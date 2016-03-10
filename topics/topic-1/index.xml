@@ -9,8 +9,54 @@
     <managingEditor>vincent.drl@gmail.com (Vincent De Smet)</managingEditor>
     <webMaster>vincent.drl@gmail.com (Vincent De Smet)</webMaster>
     <copyright>Copyright (c) 2015. All rights reserved.</copyright>
-    <lastBuildDate>Wed, 24 Feb 2016 17:10:02 +0700</lastBuildDate>
+    <lastBuildDate>Thu, 10 Mar 2016 12:52:58 +0700</lastBuildDate>
     <atom:link href="http://so0k.github.io/topics/topic-1/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Kubecon EU 2016</title>
+      <link>http://so0k.github.io/2016/03/10/kubecon-eu-2016/</link>
+      <pubDate>Thu, 10 Mar 2016 12:52:58 +0700</pubDate>
+      <author>vincent.drl@gmail.com (Vincent De Smet)</author>
+      <guid>http://so0k.github.io/2016/03/10/kubecon-eu-2016/</guid>
+      <description>
+
+&lt;p&gt;Trying to summarize the &lt;a href=&#34;https://twitter.com/search?f=tweets&amp;amp;vertical=default&amp;amp;q=%23kubecon&amp;amp;src=typd&#34;&gt;twitter streams&lt;/a&gt; so you don&amp;rsquo;t have to&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;First, read the summary blog posts from people that were actually there:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://corekube.com/2016/03/10/kubecon-london-2016-day-1/&#34;&gt;corekube.com Day 1 summary&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&#34;day-1&#34;&gt;Day 1&lt;/h1&gt;
+
+&lt;p&gt;Trying to aggregate what I find on the twitter streams:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://sysdig.com/blog/3-ways-that-kubernetes-changes-monitoring/&#34;&gt;3 ways that Kubernetes changes monitoring&lt;/a&gt; &lt;a href=&#34;https://twitter.com/sysdig&#34;&gt;@sysdig&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kubernetes.github.io&#34;&gt;new docs website&lt;/a&gt; - Contributing, fixing issues, collecting bounties &lt;a href=&#34;https://github.com/kubernetes/kubernetes.github.io&#34;&gt;repo&lt;/a&gt; - $10k dollars allotted for bug fixes&amp;hellip;&lt;/li&gt;
+&lt;li&gt;nginx ingress controller in &lt;a href=&#34;https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party&#34;&gt;contrib&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Kubernetes Volume plugins: &lt;a href=&#34;https://speakerdeck.com/agonzalezro/custom-volume-plugins&#34;&gt;slides&lt;/a&gt; &lt;a href=&#34;https://twitter.com/agonzalezro&#34;&gt;@agonzalezro&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Kubernetes meets finagle  &lt;a href=&#34;https://buoyant.io/&#34;&gt;https://buoyant.io/&lt;/a&gt; - &lt;a href=&#34;https://speakerdeck.com/olix0r/kubernetes-meets-finagle-for-resilient-microservices&#34;&gt;slides&lt;/a&gt; &lt;a href=&#34;https://twitter.com/olix0r&#34;&gt;@olix0r&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Hypernetes - &lt;a href=&#34;https://hyper.sh/&#34;&gt;https://hyper.sh/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Kubernetes and the Potential for Higher Level Interfaces - &lt;a href=&#34;https://speakerdeck.com/garethr/kubernetes-and-the-potential-for-higher-level-interfaces&#34;&gt;slides&lt;/a&gt; &lt;a href=&#34;https://twitter.com/garethr&#34;&gt;@garethr&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Container runtime explosion - &lt;a href=&#34;http://kurma.io/&#34;&gt;http://kurma.io/&lt;/a&gt; by &lt;a href=&#34;https://twitter.com/Apcera&#34;&gt;@Apcera&lt;/a&gt; - &lt;a href=&#34;https://t.co/KpBsvOBrhZ&#34;&gt;slides&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/kubernetes/kubernetes/milestones/v1.2&#34;&gt;1.2 milestones&lt;/a&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://twitter.com/meinardi/status/707976055466946560&#34;&gt;CI/CD evolution with #kubernetes namespaces&lt;/a&gt;
+&amp;amp;&amp;amp; &lt;a href=&#34;https://twitter.com/danielbryantuk/status/707980331354345473&#34;&gt;Key takeways&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;--maximum-dead-containers=100
+--maximum-dead-containers-per-container=2
+--minimum-container-ttl-duration=1m0s
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&#34;day-2&#34;&gt;Day 2&lt;/h1&gt;
+
+&lt;p&gt;Yet to start..&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>How to quickly group FlatFile records and get a grouped Field maximum</title>
@@ -86,7 +132,11 @@ ANVA190000                                                                   201
 | Select -First 10
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;I actually only want the length of the codes, so this becomes:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Above we used HashTables (a data structure which stores Key-Value pairs). In PowerShell you write HashTables with the &lt;code&gt;@{&amp;lt;key&amp;gt;=&amp;lt;value&amp;gt;}&lt;/code&gt; syntax. The &lt;code&gt;Select-Object&lt;/code&gt; cmdlet accepts a HashTable with &lt;code&gt;Name&lt;/code&gt; and &lt;code&gt;Expression&lt;/code&gt; Fields to create custom (a.k.a calculated) properties.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;I actually only want the length of the codes, so getting the Length after trimming the field gives me the following snippet:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt; $ANV | Select `
  @{Name=&amp;quot;Category&amp;quot;;Expression={$_.Substring(3,2)}}, `
@@ -94,7 +144,7 @@ ANVA190000                                                                   201
  | Select -First 10
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Now let&amp;rsquo;s group by &lt;code&gt;Category&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;Now let&amp;rsquo;s group by the &lt;code&gt;Category&lt;/code&gt; Field:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ANV | Select `
 @{Name=&amp;quot;Category&amp;quot;;Expression={$_.Substring(3,2)}}, `
@@ -118,7 +168,7 @@ Group Category | Select -First 10
    40 M0                        {@{Category=M0; CodeLength=4}, @{Category=M0; Code...}}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Great, only thing left to do is get the maximum &lt;code&gt;CodeLength&lt;/code&gt; per &lt;code&gt;Category&lt;/code&gt;&amp;hellip; most Google results tell you to sort and select the first:&lt;/p&gt;
+&lt;p&gt;Great, only thing left to do is get the maximum &lt;code&gt;CodeLength&lt;/code&gt; per &lt;code&gt;Category&lt;/code&gt;&amp;hellip; most Google results tell you to sort and select the first &lt;code&gt;ForEach&lt;/code&gt; group. &lt;code&gt;%&lt;/code&gt; is a shortcut for &lt;code&gt;ForEach&lt;/code&gt;:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ANV | Select `
 @{Name=&amp;quot;Category&amp;quot;;Expression={$_.Substring(3,2)}}, `
@@ -153,7 +203,7 @@ C4                1
 
 &lt;p&gt;&lt;strong&gt;Docker 1.10 is coming&lt;/strong&gt; and as with any release in the ever fast moving world of Docker, it is good to find out more about the use cases for the newly introduced commands, below is a list of the interesting changes that stood out for me so far:&lt;/p&gt;
 
-&lt;h3 id=&#34;container-mutability-and-the-new-docker-update-command&#34;&gt;Container Mutability and the new &lt;code&gt;docker update&lt;/code&gt; command&lt;/h3&gt;
+&lt;h3 id=&#34;container-mutability-and-the-new-docker-update-command:61aa534034babfc14972e5e817552dee&#34;&gt;Container Mutability and the new &lt;code&gt;docker update&lt;/code&gt; command&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://github.com/docker/docker/pull/15078&#34;&gt;Relevant pull request&lt;/a&gt;&lt;/p&gt;
 
@@ -220,7 +270,7 @@ systemctl show docker-4be96b853089bc6044b29cb873cac460b429cfcbdd0e877c0868eb2a90
 
 &lt;p&gt;Adding support for exposing ports, changing container restart policies and &lt;a href=&#34;https://github.com/docker/docker/pull/18958&#34;&gt;labels&lt;/a&gt; are being worked on , but do not seem to be planned for the 1.10 release, but what about &lt;code&gt;Environment variables&lt;/code&gt;?&lt;/p&gt;
 
-&lt;h3 id=&#34;container-network-model-service-discovery&#34;&gt;Container Network Model - Service Discovery&lt;/h3&gt;
+&lt;h3 id=&#34;container-network-model-service-discovery:61aa534034babfc14972e5e817552dee&#34;&gt;Container Network Model - Service Discovery&lt;/h3&gt;
 
 &lt;p&gt;With the 1.9 release, Docker moved its networking libraries from the experimental branch to the production ready branch. Networking brought a big change in the way containers find each other, deprecating Docker links as well as adding cross-host support with overlay (vxlan) networks (replacing the ambassador container pattern).&lt;/p&gt;
 
@@ -250,7 +300,7 @@ systemctl show docker-4be96b853089bc6044b29cb873cac460b429cfcbdd0e877c0868eb2a90
 
 &lt;p&gt;This was not the first time I faced this issue, but I couldn&amp;rsquo;t find my notes on how I fixed it last time (I remember it was possible to get the ProcessId from a Hyper-V VM and just kill the process, should be simple&amp;hellip;), time to properly jot it down this time for future reference&amp;hellip;&lt;/p&gt;
 
-&lt;h2 id=&#34;solution:1f197efabed05d8c95ecc233ef878914&#34;&gt;Solution&lt;/h2&gt;
+&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
 
 &lt;p&gt;I started by looking at the Properties exposed by the &lt;code&gt;Microsoft.HyperV.PowerShell.VirtualMachine&lt;/code&gt; object returned from the &lt;code&gt;Get-VM&lt;/code&gt; cmdlet. Use the &lt;code&gt;Get-Member&lt;/code&gt; cmdlet for this (or the &lt;code&gt;GM&lt;/code&gt; alias) and filter for things such as &amp;laquo;Process&amp;raquo; and &amp;laquo;Id&amp;raquo; (still falling back to old command tools such as &lt;code&gt;findstr&lt;/code&gt; out of habit&amp;hellip;)&lt;/p&gt;
 
@@ -321,7 +371,7 @@ ea0c01ad-8c66-4f84-99f4-df80e40ef3da Win2k8-Ora11.2-Sun44
 
 &lt;p&gt;Well, this isn&amp;rsquo;t really an issue if you have a local Docker daemon (I still had a CoreOS VM with a Nodejs image ready). But if you&amp;rsquo;re on Windows, you had to do some leg work in advance, I will go through the Windows steps as well. If you do not have an appropriate Windows environment set up already, it will obviously be a LOT faster to simply install NodeJS, but I had everything pre-configured so this really just took me 5 minutes (no lies, I promise!).&lt;/p&gt;
 
-&lt;h2 id=&#34;ensure-your-docker-daemon-is-running:91365d17c2334facda03bb4e3d4f873d&#34;&gt;Ensure your Docker Daemon is running&lt;/h2&gt;
+&lt;h2 id=&#34;ensure-your-docker-daemon-is-running&#34;&gt;Ensure your Docker Daemon is running&lt;/h2&gt;
 
 &lt;p&gt;Bring up the VM with PowerShell (Run As Administrator required &amp;amp; assuming you had created a CoreOS VM previously):&lt;/p&gt;
 
@@ -340,7 +390,7 @@ ea0c01ad-8c66-4f84-99f4-df80e40ef3da Win2k8-Ora11.2-Sun44
 
 &lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: You can get the IP of the VM using the &lt;code&gt;lvms&lt;/code&gt; alias I described &lt;a href=&#34;http://so0k.github.io/2016/01/07/about-this-blog-and-my-setup&#34;&gt;here&lt;/a&gt; or just read it from the Virtual Machine Connection &lt;code&gt;vmconnect&lt;/code&gt; window if you opened it earlier.&lt;/p&gt;
 
-&lt;h2 id=&#34;optionally-mount-windows-host-files-to-your-coreos-vm:91365d17c2334facda03bb4e3d4f873d&#34;&gt;Optionally, Mount Windows host files to your CoreOS VM&lt;/h2&gt;
+&lt;h2 id=&#34;optionally-mount-windows-host-files-to-your-coreos-vm&#34;&gt;Optionally, Mount Windows host files to your CoreOS VM&lt;/h2&gt;
 
 &lt;p&gt;I had already configured my CoreOS to mount shared folders from my Windows host, here are the steps to achieve this, if you can&amp;rsquo;t do this yet:&lt;/p&gt;
 
@@ -400,7 +450,7 @@ export SMB_USER=my.username
 &lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h2 id=&#34;start-a-nodejs-container-and-install-jsonresume:91365d17c2334facda03bb4e3d4f873d&#34;&gt;Start a NodeJS container and install jsonresume&lt;/h2&gt;
+&lt;h2 id=&#34;start-a-nodejs-container-and-install-jsonresume&#34;&gt;Start a NodeJS container and install jsonresume&lt;/h2&gt;
 
 &lt;p&gt;Create a new container using the official NodeJS Docker Image (no tag = latest tag), this will be pulled if you do not have an image already. (I can only confirm this works with &lt;code&gt;node:0.12&lt;/code&gt; which is the version I already had on my daemon)&lt;/p&gt;
 
@@ -455,7 +505,7 @@ cd /mnt/win/jsonresume
 
 &lt;p&gt;I estimate it takes about 3 hours to work through the guide.&lt;/p&gt;
 
-&lt;h3 id=&#34;digital-ocean-article-preview-do-preview-how-to-provision-a-kubernetes-cluster-using-coreos-html&#34;&gt;&lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;Digital Ocean Article Preview&lt;/a&gt;&lt;/h3&gt;
+&lt;h3 id=&#34;digital-ocean-article-preview-do-preview-how-to-provision-a-kubernetes-cluster-using-coreos-html:a91459261407d5d36808cf519d4f7594&#34;&gt;&lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;Digital Ocean Article Preview&lt;/a&gt;&lt;/h3&gt;
 
 &lt;p&gt;Using the &lt;a href=&#34;https://www.digitalocean.com/community/markdown&#34;&gt;Markdown Preview Generator from Digital Ocean&lt;/a&gt; I generated and copied the article preview &lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos-v2.html&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 

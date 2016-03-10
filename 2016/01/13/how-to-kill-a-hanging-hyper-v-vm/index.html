@@ -226,7 +226,7 @@
 
 <p>This was not the first time I faced this issue, but I couldn&rsquo;t find my notes on how I fixed it last time (I remember it was possible to get the ProcessId from a Hyper-V VM and just kill the process, should be simple&hellip;), time to properly jot it down this time for future reference&hellip;</p>
 
-<h2 id="solution:1f197efabed05d8c95ecc233ef878914">Solution</h2>
+<h2 id="solution">Solution</h2>
 
 <p>I started by looking at the Properties exposed by the <code>Microsoft.HyperV.PowerShell.VirtualMachine</code> object returned from the <code>Get-VM</code> cmdlet. Use the <code>Get-Member</code> cmdlet for this (or the <code>GM</code> alias) and filter for things such as &laquo;Process&raquo; and &laquo;Id&raquo; (still falling back to old command tools such as <code>findstr</code> out of habit&hellip;)</p>
 

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Kubernetes on Guides and Notes by Vincent</title>
-    <link>http://so0k.github.io/tags/kubernetes/</link>
-    <description>Recent content in Kubernetes on Guides and Notes by Vincent</description>
+    <title>Kubecon on Guides and Notes by Vincent</title>
+    <link>http://so0k.github.io/tags/kubecon/</link>
+    <description>Recent content in Kubecon on Guides and Notes by Vincent</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <managingEditor>vincent.drl@gmail.com (Vincent De Smet)</managingEditor>
     <webMaster>vincent.drl@gmail.com (Vincent De Smet)</webMaster>
     <copyright>Copyright (c) 2015. All rights reserved.</copyright>
     <lastBuildDate>Thu, 10 Mar 2016 12:52:58 +0700</lastBuildDate>
-    <atom:link href="http://so0k.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://so0k.github.io/tags/kubecon/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Kubecon EU 2016</title>
@@ -55,51 +55,6 @@
 &lt;h1 id=&#34;day-2&#34;&gt;Day 2&lt;/h1&gt;
 
 &lt;p&gt;Yet to start..&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Kubernetes Workshop for Docker Saigon</title>
-      <link>http://so0k.github.io/2016/01/07/kubernetes-workshop-for-docker-saigon/</link>
-      <pubDate>Thu, 07 Jan 2016 12:27:33 +0700</pubDate>
-      <author>vincent.drl@gmail.com (Vincent De Smet)</author>
-      <guid>http://so0k.github.io/2016/01/07/kubernetes-workshop-for-docker-saigon/</guid>
-      <description>
-
-&lt;p&gt;This is &lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;the first draft of a guide&lt;/a&gt; I wrote to set up Kubernetes with CoreOS on DigitalOcean. This guide is battle-tested through a workshop for the &lt;a href=&#34;http://docker-saigon.github.io&#34;&gt;Docker-Saigon&lt;/a&gt; Meetup Group. During the workshop, Users may use this draft to follow along with the instructions until the guide has been officially published on Digital Ocean.&lt;/p&gt;
-
-&lt;p&gt;Attendees need to have:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;A laptop (Linux/OSX/Windows should all be fine)&lt;/li&gt;
-&lt;li&gt;A console ready to go with access to &lt;code&gt;git&lt;/code&gt; &amp;amp; &lt;code&gt;openssh&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;A &lt;a href=&#34;https://www.digitalocean.com/?refcode=d6a3f4aecbdf&#34;&gt;Digital Ocean&lt;/a&gt; account ready (if you do not have an account, feel free to sign up with &lt;a href=&#34;https://www.digitalocean.com/?refcode=d6a3f4aecbdf&#34;&gt;my referral link&lt;/a&gt;)&lt;/li&gt;
-&lt;li&gt;Decent Docker knowledge&lt;/li&gt;
-&lt;li&gt;Some CoreOS / Systemd knowledge&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;I estimate it takes about 3 hours to work through the guide.&lt;/p&gt;
-
-&lt;h3 id=&#34;digital-ocean-article-preview-do-preview-how-to-provision-a-kubernetes-cluster-using-coreos-html:a91459261407d5d36808cf519d4f7594&#34;&gt;&lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;Digital Ocean Article Preview&lt;/a&gt;&lt;/h3&gt;
-
-&lt;p&gt;Using the &lt;a href=&#34;https://www.digitalocean.com/community/markdown&#34;&gt;Markdown Preview Generator from Digital Ocean&lt;/a&gt; I generated and copied the article preview &lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos-v2.html&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;&lt;img src=&#34;http://so0k.github.io/assets/images/sammy-jetpack.png&#34; alt=&#34;Sammy Jetpack!&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;Logo &amp;copy; Digital Ocean and designed by &lt;a href=&#34;https://twitter.com/simonoxleee&#34;&gt;Simon Oxley&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;EDIT - 2016-01-08&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Added link to Article Preview&lt;/li&gt;
-&lt;li&gt;Removed full article from blog post as HighlightJS was causing rendering issues.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;EDIT - 2016-01-13&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;replaced link to Article Preview to point to v2&lt;/li&gt;
-&lt;/ul&gt;
 </description>
     </item>
     

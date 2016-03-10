@@ -86,7 +86,11 @@ ANVA190000                                                                   201
 | Select -First 10
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;I actually only want the length of the codes, so this becomes:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Above we used HashTables (a data structure which stores Key-Value pairs). In PowerShell you write HashTables with the &lt;code&gt;@{&amp;lt;key&amp;gt;=&amp;lt;value&amp;gt;}&lt;/code&gt; syntax. The &lt;code&gt;Select-Object&lt;/code&gt; cmdlet accepts a HashTable with &lt;code&gt;Name&lt;/code&gt; and &lt;code&gt;Expression&lt;/code&gt; Fields to create custom (a.k.a calculated) properties.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;I actually only want the length of the codes, so getting the Length after trimming the field gives me the following snippet:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt; $ANV | Select `
  @{Name=&amp;quot;Category&amp;quot;;Expression={$_.Substring(3,2)}}, `
@@ -94,7 +98,7 @@ ANVA190000                                                                   201
  | Select -First 10
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Now let&amp;rsquo;s group by &lt;code&gt;Category&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;Now let&amp;rsquo;s group by the &lt;code&gt;Category&lt;/code&gt; Field:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ANV | Select `
 @{Name=&amp;quot;Category&amp;quot;;Expression={$_.Substring(3,2)}}, `
@@ -118,7 +122,7 @@ Group Category | Select -First 10
    40 M0                        {@{Category=M0; CodeLength=4}, @{Category=M0; Code...}}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Great, only thing left to do is get the maximum &lt;code&gt;CodeLength&lt;/code&gt; per &lt;code&gt;Category&lt;/code&gt;&amp;hellip; most Google results tell you to sort and select the first:&lt;/p&gt;
+&lt;p&gt;Great, only thing left to do is get the maximum &lt;code&gt;CodeLength&lt;/code&gt; per &lt;code&gt;Category&lt;/code&gt;&amp;hellip; most Google results tell you to sort and select the first &lt;code&gt;ForEach&lt;/code&gt; group. &lt;code&gt;%&lt;/code&gt; is a shortcut for &lt;code&gt;ForEach&lt;/code&gt;:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ANV | Select `
 @{Name=&amp;quot;Category&amp;quot;;Expression={$_.Substring(3,2)}}, `
@@ -161,7 +165,7 @@ C4                1
 
 &lt;p&gt;This was not the first time I faced this issue, but I couldn&amp;rsquo;t find my notes on how I fixed it last time (I remember it was possible to get the ProcessId from a Hyper-V VM and just kill the process, should be simple&amp;hellip;), time to properly jot it down this time for future reference&amp;hellip;&lt;/p&gt;
 
-&lt;h2 id=&#34;solution:1f197efabed05d8c95ecc233ef878914&#34;&gt;Solution&lt;/h2&gt;
+&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
 
 &lt;p&gt;I started by looking at the Properties exposed by the &lt;code&gt;Microsoft.HyperV.PowerShell.VirtualMachine&lt;/code&gt; object returned from the &lt;code&gt;Get-VM&lt;/code&gt; cmdlet. Use the &lt;code&gt;Get-Member&lt;/code&gt; cmdlet for this (or the &lt;code&gt;GM&lt;/code&gt; alias) and filter for things such as &amp;laquo;Process&amp;raquo; and &amp;laquo;Id&amp;raquo; (still falling back to old command tools such as &lt;code&gt;findstr&lt;/code&gt; out of habit&amp;hellip;)&lt;/p&gt;
 

@@ -28,7 +28,7 @@
 
 &lt;p&gt;Well, this isn&amp;rsquo;t really an issue if you have a local Docker daemon (I still had a CoreOS VM with a Nodejs image ready). But if you&amp;rsquo;re on Windows, you had to do some leg work in advance, I will go through the Windows steps as well. If you do not have an appropriate Windows environment set up already, it will obviously be a LOT faster to simply install NodeJS, but I had everything pre-configured so this really just took me 5 minutes (no lies, I promise!).&lt;/p&gt;
 
-&lt;h2 id=&#34;ensure-your-docker-daemon-is-running:91365d17c2334facda03bb4e3d4f873d&#34;&gt;Ensure your Docker Daemon is running&lt;/h2&gt;
+&lt;h2 id=&#34;ensure-your-docker-daemon-is-running&#34;&gt;Ensure your Docker Daemon is running&lt;/h2&gt;
 
 &lt;p&gt;Bring up the VM with PowerShell (Run As Administrator required &amp;amp; assuming you had created a CoreOS VM previously):&lt;/p&gt;
 
@@ -47,7 +47,7 @@
 
 &lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: You can get the IP of the VM using the &lt;code&gt;lvms&lt;/code&gt; alias I described &lt;a href=&#34;http://so0k.github.io/2016/01/07/about-this-blog-and-my-setup&#34;&gt;here&lt;/a&gt; or just read it from the Virtual Machine Connection &lt;code&gt;vmconnect&lt;/code&gt; window if you opened it earlier.&lt;/p&gt;
 
-&lt;h2 id=&#34;optionally-mount-windows-host-files-to-your-coreos-vm:91365d17c2334facda03bb4e3d4f873d&#34;&gt;Optionally, Mount Windows host files to your CoreOS VM&lt;/h2&gt;
+&lt;h2 id=&#34;optionally-mount-windows-host-files-to-your-coreos-vm&#34;&gt;Optionally, Mount Windows host files to your CoreOS VM&lt;/h2&gt;
 
 &lt;p&gt;I had already configured my CoreOS to mount shared folders from my Windows host, here are the steps to achieve this, if you can&amp;rsquo;t do this yet:&lt;/p&gt;
 
@@ -107,7 +107,7 @@ export SMB_USER=my.username
 &lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h2 id=&#34;start-a-nodejs-container-and-install-jsonresume:91365d17c2334facda03bb4e3d4f873d&#34;&gt;Start a NodeJS container and install jsonresume&lt;/h2&gt;
+&lt;h2 id=&#34;start-a-nodejs-container-and-install-jsonresume&#34;&gt;Start a NodeJS container and install jsonresume&lt;/h2&gt;
 
 &lt;p&gt;Create a new container using the official NodeJS Docker Image (no tag = latest tag), this will be pulled if you do not have an image already. (I can only confirm this works with &lt;code&gt;node:0.12&lt;/code&gt; which is the version I already had on my daemon)&lt;/p&gt;
 
