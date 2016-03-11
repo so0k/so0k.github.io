@@ -59,7 +59,7 @@
     },
     "datePublished": "2016-03-10",
     "description": "Aggregation of data from KubeCon EU 2016",
-    "wordCount":  121 
+    "wordCount":  174 
   }
 </script>
 
@@ -187,7 +187,7 @@
     &middot; by Vincent De Smet
   
   &middot; Read in about 1 min
-  &middot; (121 Words)
+  &middot; (174 Words)
 </small>
 
 
@@ -217,17 +217,18 @@
 <p>First, read the summary blog posts from people that were actually there:</p>
 
 <ul>
-<li><a href="https://corekube.com/2016/03/10/kubecon-london-2016-day-1/">corekube.com Day 1 summary</a></li>
+<li><a href="https://corekube.com/2016/03/10/kubecon-london-2016-day-1/">corekube.com Day 1 Summary</a></li>
+<li><a href="http://livewyer.com/blog/2016/03/10/kubecon-eu-day-1-summary">livewyer.com/ Day 1 Summary</a></li>
 </ul>
 
 <h1 id="day-1">Day 1</h1>
 
-<p>Trying to aggregate what I find on the twitter streams:</p>
-
 <ul>
+<li><a href="https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/deployment.md">Deployments</a> manage <strong>ReplicaSets</strong> (Replication Controllers) based on template. Updating the template will act based on the diff, i.e. version updates will result in a rolling update (zero downtime)</li>
+<li><a href="https://github.com/eBay/Kubernetes/blob/master/docs/proposals/configmap.md">Config Maps</a> take the pod configuration out of the pod and let the kubelet provision it (either as env vars or config files mounted into the pod).</li>
 <li><a href="https://sysdig.com/blog/3-ways-that-kubernetes-changes-monitoring/">3 ways that Kubernetes changes monitoring</a> <a href="https://twitter.com/sysdig">@sysdig</a></li>
 <li><a href="https://kubernetes.github.io">new docs website</a> - Contributing, fixing issues, collecting bounties <a href="https://github.com/kubernetes/kubernetes.github.io">repo</a> - $10k dollars allotted for bug fixes&hellip;</li>
-<li>nginx ingress controller in <a href="https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party">contrib</a></li>
+<li>Extending Services &amp; Ingress with nginx - in <a href="https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party">contrib</a></li>
 <li>Kubernetes Volume plugins: <a href="https://speakerdeck.com/agonzalezro/custom-volume-plugins">slides</a> <a href="https://twitter.com/agonzalezro">@agonzalezro</a></li>
 <li>Kubernetes meets finagle  <a href="https://buoyant.io/">https://buoyant.io/</a> - <a href="https://speakerdeck.com/olix0r/kubernetes-meets-finagle-for-resilient-microservices">slides</a> <a href="https://twitter.com/olix0r">@olix0r</a></li>
 <li>Hypernetes - <a href="https://hyper.sh/">https://hyper.sh/</a></li>
