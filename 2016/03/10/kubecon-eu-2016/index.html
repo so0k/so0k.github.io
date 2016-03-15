@@ -59,7 +59,7 @@
     },
     "datePublished": "2016-03-10",
     "description": "Aggregation of data from KubeCon EU 2016",
-    "wordCount":  199 
+    "wordCount":  895 
   }
 </script>
 
@@ -186,8 +186,8 @@
   <small>
     &middot; by Vincent De Smet
   
-  &middot; Read in about 1 min
-  &middot; (199 Words)
+  &middot; Read in about 5 min
+  &middot; (895 Words)
 </small>
 
 
@@ -212,44 +212,151 @@
   <div class="container content">
   
 
-<p>Trying to summarize the <a href="https://twitter.com/search?f=tweets&amp;vertical=default&amp;q=%23kubecon&amp;src=typd">twitter streams</a> so you don&rsquo;t have to&hellip;</p>
+<p>Trying to summarize the <a href="https://twitter.com/search?f=tweets&amp;vertical=default&amp;q=%23kubecon&amp;src=typd">twitter streams</a> &amp; <a href="https://twitter.com/kubeconio">@kubeconio</a> so you don&rsquo;t have to&hellip;</p>
 
-<p>First, read the summary blog posts from people that were actually there:</p>
+<p>First, see the updated docs to <a href="http://kubernetes.io/docs/whatisk8s/">if you&rsquo;re still wondering what Kubernetes is.</a></p>
+
+<p>Then, refer to the summary blog posts from people that were actually at KubeCon:</p>
 
 <ul>
 <li><a href="https://corekube.com/2016/03/10/kubecon-london-2016-day-1/">corekube.com Day 1 Summary</a></li>
 <li><a href="http://livewyer.com/blog/2016/03/10/kubecon-eu-day-1-summary">livewyer.com/ Day 1 Summary</a></li>
 </ul>
 
-<h1 id="day-1:3b7fb9cf5e36b8b80caf14cf71cdf18e">Day 1</h1>
+<p>&amp; Summaries after the Conference finished:</p>
 
 <ul>
-<li><a href="https://github.com/kubernetes/kubernetes/pull/19042">ReplicaSets</a> - ReplicaSets support a more generic selector compared to Replication Controllers - <a href="http://kubernet.es/docs/user-guide/labels/#set-based-requirement">explanation of difference</a></li>
-<li><a href="https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/deployment.md">Deployments</a> manage ReplicaSets based on a template. Updating the template will make deployments act based on the diff, i.e. version updates will result in a rolling update (w/ zero downtime)</li>
-<li><a href="https://github.com/eBay/Kubernetes/blob/master/docs/proposals/configmap.md">Config Maps</a> take the pod configuration out of the pod and let the kubelet provision it (either as env vars or config files mounted into the pod).</li>
-<li>CoreOS rkt first approach - <a href="https://coreos.com/kubernetes/docs/latest/kubelet-wrapper.html">New kubelet-wrapper</a></li>
-<li><a href="https://sysdig.com/blog/3-ways-that-kubernetes-changes-monitoring/">3 ways that Kubernetes changes monitoring</a> <a href="https://twitter.com/sysdig">@sysdig</a></li>
-<li><a href="https://kubernetes.github.io">new docs website</a> - Contributing, fixing issues, collecting bounties <a href="https://github.com/kubernetes/kubernetes.github.io">repo</a> - $10k dollars allotted for bug fixes&hellip;</li>
-<li>Extending Services &amp; Ingress with nginx - in <a href="https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party">contrib</a></li>
-<li>Kubernetes Volume plugins: <a href="https://speakerdeck.com/agonzalezro/custom-volume-plugins">slides</a> <a href="https://twitter.com/agonzalezro">@agonzalezro</a></li>
-<li>Kubernetes meets finagle  <a href="https://buoyant.io/">https://buoyant.io/</a> - <a href="https://speakerdeck.com/olix0r/kubernetes-meets-finagle-for-resilient-microservices">slides</a> <a href="https://twitter.com/olix0r">@olix0r</a></li>
-<li>Hypernetes - <a href="https://hyper.sh/">https://hyper.sh/</a></li>
-<li>Kubernetes and the Potential for Higher Level Interfaces - <a href="https://speakerdeck.com/garethr/kubernetes-and-the-potential-for-higher-level-interfaces">slides</a> <a href="https://twitter.com/garethr">@garethr</a></li>
-<li>Container runtime explosion - <a href="http://kurma.io/">http://kurma.io/</a> by <a href="https://twitter.com/Apcera">@Apcera</a> - <a href="https://t.co/KpBsvOBrhZ">slides</a></li>
-<li><a href="https://github.com/kubernetes/kubernetes/milestones/v1.2">1.2 milestones</a></li>
+<li><a href="https://corekube.com/2016/03/11/kubecon-london-2016-day-2/">corekube.com Day 2 Summary</a></li>
+<li><a href="http://techapostle.blogspot.com/2016/03/insights-from-kubecon-eu-2016.html">Insights from Kubernetes</a></li>
+<li><a href="http://www.benjvi.com/2016/03/13/tldr-kubecon">TL/DR: KubeCon</a></li>
+<li><a href="http://qaware.blogspot.in/2016/03/kubecon-2016-recap.html">QAware Kubecon Recap</a></li>
+</ul>
 
-<li><p><a href="https://twitter.com/meinardi/status/707976055466946560">CI/CD evolution with #kubernetes namespaces</a>
+<p>What I pieced together from the Twitter Stream:</p>
+
+<h1 id="day-1">Day 1</h1>
+
+<ul>
+<li><p>Kubernetes 1.2 available by end of March 2016</p></li>
+
+<li><p><a href="https://github.com/kubernetes/kubernetes/pull/19042">ReplicaSets</a> - ReplicaSets support a more generic selector compared to Replication Controllers - <a href="http://kubernet.es/docs/user-guide/labels/#set-based-requirement">explanation of difference</a></p></li>
+
+<li><p><a href="https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/deployment.md">Deployments</a> manage ReplicaSets based on a template. Updating the template will make deployments act based on the difference of Desired vs Actual state, i.e. version updates will result in a rolling update (w/ zero downtime)</p></li>
+
+<li><p><a href="https://github.com/eBay/Kubernetes/blob/master/docs/proposals/configmap.md">Config Maps</a> - late-binding, live-updated and atomic. Take the pod configuration out of the pod and let the kubelet provision it (either as env vars or config files mounted into the pod). Secrets were used to late bind config, Config Maps are designed as a better solution for this requirement. (see also: <a href="https://github.com/kubernetes/kubernetes/issues/12732">Kubernetes/Issues/12732</a> - Keys/Certs generation for services)</p></li>
+
+<li><p><a href="http://kubernetes.io/docs/admin/daemons/">DaemonSet</a> (i.e. cluster-wide node agents for logging / networking / storage / &hellip; )</p></li>
+
+<li><p><a href="http://buff.ly/22d9cUn">Kubernetes Dashboard Questionnaire</a></p></li>
+
+<li><p>Cloud Native Computing Foundation (CNCF): Linux Foundation Collaborative project aiming to advance a common set of open source tech to accelerate adoption of microservices, containers and cloud native applications. <a href="http://www.linuxfoundation.org/news-media/announcements/2016/03/cloud-native-computing-foundation-accepts-kubernetes-first-hosted-0">CNCF Accepts k8s as First Hosted Project</a> - 1 goal is to establish a 1000-node cluster for the CNCF community to run and validate Cloud Native applications and infrastructure at scale.</p></li>
+
+<li><p>CoreOS: rkt-first approach - <a href="https://coreos.com/kubernetes/docs/latest/kubelet-wrapper.html">New kubelet-wrapper</a> - <a href="https://twitter.com/teamKatacoda/status/707902083094208512">80% feature parity</a> - estimated for end of 2016Q1 - <a href="https://speakerdeck.com/joshix/coreos-rkt-and-kubernetes">Slides?</a> by <a href="https://twitter.com/joshixisjosh9">@joshixisjosh9</a> - Appc Builder: <a href="https://github.com/blablacar/dgr">dgr</a></p></li>
+
+<li><p>Used by a lot of KubeCon demos: <a href="https://github.com/weaveworks/scope">Weave Scope</a> provides a visual map of your Docker containers, so you can intuitively understand, monitor, and control your applications. Scope comes with built-in <a href="https://github.com/weaveworks/scope#using-weave-scope-with-kubernetes">Kubernetes support</a>. <a href="https://www.projectcalico.org/calico-and-weave-scope/">Use Scope to visualize Calico</a></p></li>
+
+<li><p><a href="https://kubernetes.github.io">New Docs website</a> - Contributing, fixing issues, collecting bounties <a href="https://github.com/kubernetes/kubernetes.github.io">repo</a> - $10k dollars allotted for bug fixes&hellip;</p></li>
+
+<li><p><a href="http://kubeconeurope2016.sched.org/event/67dA/kubernetes-and-the-potential-for-higher-level-interfaces">Kubernetes and the Potential for Higher Level Interfaces</a> - <a href="https://speakerdeck.com/garethr/kubernetes-and-the-potential-for-higher-level-interfaces">slides</a> by <a href="https://twitter.com/garethr">@garethr</a></p></li>
+
+<li><p><a href="http://kubeconeurope2016.sched.org/event/6BYf/cloud-native-sdn-for-kubernetes">Cloud-Native SDN for Kubernetes</a> - <a href="http://www.slideshare.net/RomanaProject/kubecon-london-2016-ronana-cloud-native-sdn">slides</a> - <a href="https://github.com/romana/romana">Romana</a>: <a href="https://github.com/appc/cni">CNI</a> plugin for k8s. With Romana you won’t have the overhead of a virtual network overlay so your Nodes will communicate more directly without tunnels or encapsulation - <a href="https://youtu.be/qSeVvVn3K2U?t=24m30s">Video from demo at Meetup</a>. See also <a href="http://romana.io/blog/kubernetes/">Running k8s with Romana</a> &amp; <a href="http://www.slideshare.net/RomanaProject/cloud-native-sdn">Slides from Meetup</a>.</p></li>
+
+<li><p>SDN - See also: <a href="https://kubeconeurope2016.sched.org/event/6BUR/simple-scalable-secure-networking-for-kuberhellip">Scalable networking with Calico</a></p></li>
+
+<li><p>SDN - See also: Open Contrail on pannel discussion - ref: <a href="http://www.opencontrail.org/kubernetes-and-openstack-multi-cloud-networking/">k8s &amp; OpenSTack</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6Bbu/the-state-of-state">The State of State</a> - no slides :( - <a href="https://twitter.com/meinardi/status/707893808877457408">tweeted summary slide?</a></p></li>
+</ul>
+
+<blockquote>
+<p>persistent volumes providing cluster-wide non-ephemeral storage. A couple of different cluster storage providers are available for persistent volumes in k8s: More classic ones like NFS and SCSI; cloud native ones like GlusterFS and Ceph; cloud provider specific ones for GCE and AWS and storage abstraction layers like Flocker.</p>
+</blockquote>
+
+<ul>
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6Bc9/creating-an-advanced-load-balancing-solution-hellip">Extending Services &amp; Ingress with nginx</a> - in <a href="https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party">contrib</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6BYB/custom-volume-plugins">Kubernetes Volume plugins</a> - <a href="https://speakerdeck.com/agonzalezro/custom-volume-plugins">slides</a> by <a href="https://twitter.com/agonzalezro">@agonzalezro</a></p></li>
+
+<li><p><a href="http://kubeconeurope2016.sched.org/event/6BhW/kubernetes-meets-finagle-for-resilient-microservices">Kubernetes meets twitter/finagle for Resilient Microservices</a> see: <a href="https://github.com/buoyantio/linkerd">linkerd</a> - <a href="https://speakerdeck.com/olix0r/kubernetes-meets-finagle-for-resilient-microservices">slides</a> by <a href="https://twitter.com/olix0r">@olix0r</a></p></li>
+
+<li><p><a href="http://kubeconeurope2016.sched.org/event/6BZX/if-you-can-drink-and-watch-star-wars-you-can-handle-kubernetes-in-production-because-thats-exactly-what-we-did">If you can drink and watch Star Wars, you can handle Kubernetes in production (Because that’s exactly what we did)</a> - <a href="https://speakerdeck.com/errordeveloper/barriers-to-adoption-of-kubernetes-in-production">slides</a> by <a href="https://twitter.com/errordeveloper">@errordeveloper</a> &amp; <a href="https://twitter.com/weaveworks">@weaveworks</a> - see also: <a href="https://github.com/weaveworks/weave-kubernetes-anywhere">k8s Anywhere</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6BV4/full-automatic-database-postgresql-ha-with-khellip">Fully Automatic Database: PosgresSQL - HA wit k8s</a> - <a href="http://jberkus.github.io/full_automatic_db/index.html#1">slides</a> by <a href="https://twitter.com/fuzzychef">@fuzzychef</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6BUy/monitoring-microservices-docker-kuberneteshellip">Monitoring Microservices at scale</a> - <a href="https://sysdig.com/blog/3-ways-that-kubernetes-changes-monitoring/">3 ways that Kubernetes changes monitoring</a> by <a href="https://twitter.com/sysdig">@sysdig</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/67f2/kubernetes-in-production-in-the-new-york-timehellip">Kubernetes in Production at the New York Times</a> - <a href="http://slides.com/ericlewis-1/kubernetes-at-the-new-york-times#/">slides</a> by <a href="https://twitter.com/ericandrewlewis">@ericandrewlewis</a> (CoreOS on AWS)</p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6Bcb/leveraging-ephemeral-namespaces-in-a-cicd-pihellip">Leveraging ephemeral namespaces in a CI/CD pipeline</a> - by <a href="https://twitter.com/canthefason">@canthefason</a> - see: <a href="https://twitter.com/meinardi/status/707976055466946560">CI/CD evolution with #kubernetes namespaces</a>
 &amp;&amp; <a href="https://twitter.com/danielbryantuk/status/707980331354345473">Key takeways</a></p>
 
 <pre><code>--maximum-dead-containers=100
 --maximum-dead-containers-per-container=2
 --minimum-container-ttl-duration=1m0s
 </code></pre></li>
+
+<li><p><a href="http://labs.unacast.com/2015/12/07/chatops-small-fails-and-big-wins/">ChatOps: Small fails and big wins</a> by <a href="https://twitter.com/heim">@heim</a></p></li>
 </ul>
 
-<h1 id="day-2:3b7fb9cf5e36b8b80caf14cf71cdf18e">Day 2</h1>
+<blockquote>
+<p>Best practice for CI/CD on k8s seems to be: separate different applications and stages by using k8s namespaces and use ChatOps tools like Hubot (<a href="https://hubot.github.com">https://hubot.github.com</a>) to provide fast feedback to the devs &amp; ops.</p>
+</blockquote>
 
-<p>Yet to start..</p>
+<ul>
+<li><p>Hypernetes - <a href="https://hyper.sh/">https://hyper.sh/</a> (Similar to ClearOS from intel?)</p></li>
+
+<li><p>Container Wars continued? - <a href="http://kurma.io/">http://kurma.io/</a> by <a href="https://twitter.com/Apcera">@Apcera</a> - <a href="http://www.slideshare.net/Apcera/kurma-a-containerized-container-platform-kubecon-2016">slides</a></p></li>
+
+<li><p><a href="https://github.com/kubernetes/kubernetes/milestones/v1.2">1.2 milestones</a> &amp; <a href="https://www.gcppodcast.com/post/episode-16-kubernetes-1-dot-2-with-kelsey-hightower/">Google Cloud Platform Podcast with Kelsey Hightower</a> (starts at 06:20)</p></li>
+
+<li><p>Apprenda Sales pitch? <a href="https://kubeconeurope2016.sched.org/event/68yE/hybrid-apps-orchestrating-cloud-native-and-thellip">Hybrid Apps: Orchestrating Cloud Native and Traditional Application Architectures</a> by <a href="https://twitter.com/sschuller">@sschuller</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6BTj/a-lightweight-deployment-system-for-appops">A lightweight deployment system for &laquo;appops&raquo;</a> - <a href="https://www.youtube.com/watch?v=TJpucj4v4iE">kubernauts/kploy</a></p></li>
+
+<li><p>RedHat OpenShift: <a href="http://rhelblog.redhat.com/2016/02/23/the-red-hat-ecosystem-for-microservice-and-container-development/">The Red Hat Ecosystem for Microservice and Container Development</a> - <a href="https://blog.openshift.com/tag/kubernetes/">tag: Kubernetes</a></p></li>
+</ul>
+
+<h1 id="day-2">Day 2</h1>
+
+<ul>
+<li><p><a href="https://kubeconeurope2016.sched.org/event/68lU/day-2-keynote-pushing-kubernetes-forward">Pushing Kubernetes Forward</a></p>
+
+<ul>
+<li><a href="https://github.com/polvi/monokube">polvi/monokube</a> by <a href="https://twitter.com/polvi">@polvi</a></li>
+<li>etcd v3 (gRPC &amp; HTTP/2) &amp; API improvements for k8s use-case (see <a href="https://github.com/coreos/etcd/tree/master/etcdctlv3#watch-options-key-or-prefix">watch</a> Key/Prefix &amp; Rev options)</li>
+<li>Multiple image formats in v1.3 API</li>
+</ul></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6Bb3/using-traffic-control-to-test-apps-in-containers">Using Traffic control to Test Apps in Containers</a> by <a href="https://twitter.com/kinvolkio">@kinvolkio</a> / <a href="https://twitter.com/albcr">@albcr</a> - <a href="https://github.com/kinvolk/demo/tree/master/traffic-control-rkt">GitHub Repo</a> - See <a href="https://kinvolk.io/blog/">kinvolk.io Blog post</a> with video demonstration. Weave/Scope <a href="https://twitter.com/weaveworks/status/708245029278629888">Viz1</a> <a href="https://twitter.com/lxpollitt/status/708245298817146880">Viz2</a> and <a href="https://github.com/kinvolk/tcd">tcd</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6BVH/templatized-application-configuration-on-openhellip">Templatized Application configuration</a> - Resources</p>
+
+<ul>
+<li><a href="https://docs.openshift.org/latest/dev_guide/templates.html">Openshift Templates</a></li>
+<li><a href="https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/templates.md">Kubernetes Templates</a> (Proposal)</li>
+<li><a href="https://github.com/kubernetes/kubernetes/issue/12732">Kubernetes Secret Generation</a></li>
+<li><a href="http://helm.sh">Helm</a> (to merge with Deployment Manager?)</li>
+<li><a href="https://github.com/kubernetes/deployment-manager">Deployment-Manager</a></li>
+</ul></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/67dI/itnw-if-this-now-what-orchestrating-an-enthellip">If This Now What: Orchestrating an Enterprise</a> - <a href="http://www.devoperandi.com/wp-content/uploads/2016/03/KubeConPreso.pdf">slides</a> see also: <a href="http://www.devoperandi.com/kubernetes-stackstorm-and-third-party-resources-part-2/">Blog post</a> - <a href="https://github.com/mward29/st2contrib/tree/master/packs/kubernetes">Kubernetes Pack</a> by <a href="https://twitter.com/DevoperandI">@DevoperandI</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6BY8/interactive-monitoring-for-kubernetes">Interactive Monitoring for Kubernetes</a> - <a href="http://www.slideshare.net/weaveworks/interactive-monitoring-for-kubernetes">slides</a> by <a href="https://twitter.com/tom_wilkie">@tom_wilkie</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/67dM/your-app-is-alive">Your App is alive</a> - <a href="https://speakerdeck.com/michellen/kubecon-healthchecks-pdf">Slides from KubeCon</a> &amp; <a href="https://speakerdeck.com/michellen/your-app-is-alive">Slides from Colorado meetup</a> (prior to kubecon) - <a href="https://github.com/michelleN/puffy">simple Go server</a></p></li>
+
+<li><p>Transforming the Government - notice: <a href="https://github.com/UKHomeOffice/vault-sidekick">UKHomeOffice/vault-sidekick</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6BcS/kubernetes-storage-101">Kubernetes Storage 101</a> -  <a href="storage.redhat.com/2015/06/22/red-hat-drives-deeper-integration-of-persistent-storage-for-containerized-environments/">RedHat Storage</a> <a href="https://corekube.com/2016/03/14/kubecon-pi-day-volumes/">corekube Volumes Deep dive</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6BZa/a-practical-guide-to-container-scheduling">A Practical Guide to Container Scheduling</a> by <a href="https://twitter.com/tekgrrl">@tekgrrl</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/67d4/making-sense-of-the-growing-kubernetes-communhellip">Making Sense of the Kubernetes community</a> by <a href="https://twitter.com/fintanr">@fintanr</a> - <a href="http://redmonk.com/fryan/2016/03/14/the-further-evolution-of-kubernetes/">Blog Post</a></p></li>
+
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6BUp/trading-in-the-kube">Trading in the Kube</a> Note: <a href="http://adaptiveconsulting.github.io/ReactiveTraderJS">AdaptiveConsulting/ReactiveTraderCloud</a></p></li>
+</ul>
+
+<p>Last updated: Tuesday, March 15</p>
 
 </div>
 
