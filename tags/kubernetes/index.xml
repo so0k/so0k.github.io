@@ -28,30 +28,33 @@
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://corekube.com/2016/03/10/kubecon-london-2016-day-1/&#34;&gt;corekube.com Day 1 Summary&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://livewyer.com/blog/2016/03/10/kubecon-eu-day-1-summary&#34;&gt;livewyer.com/ Day 1 Summary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://livewyer.com/blog/2016/03/10/kubecon-eu-day-1-summary&#34;&gt;livewyer.com Day 1 Summary&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;&amp;amp; Summaries after the Conference finished:&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://corekube.com/2016/03/11/kubecon-london-2016-day-2/&#34;&gt;corekube.com Day 2 Summary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.livewyer.com/blog/2016/03/14/kubecon-europe-day-2-summary-and-retrospective&#34;&gt;livewyer.com Day 2 Summary&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;http://techapostle.blogspot.com/2016/03/insights-from-kubecon-eu-2016.html&#34;&gt;Insights from Kubernetes&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;http://www.benjvi.com/2016/03/13/tldr-kubecon&#34;&gt;TL/DR: KubeCon&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;http://qaware.blogspot.in/2016/03/kubecon-2016-recap.html&#34;&gt;QAware Kubecon Recap&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://macyves.wordpress.com/2016/03/16/kubecon-16-for-me-inspiration-community-and-strategic-validation/&#34;&gt;Kubecon for me&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.flexiant.com/2016/03/16/the-aftermath-of-kubecon-eu/&#34;&gt;Aftermath of KubeCon EU&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;What I pieced together from the Twitter Stream:&lt;/p&gt;
 
-&lt;h1 id=&#34;day-1:3b7fb9cf5e36b8b80caf14cf71cdf18e&#34;&gt;Day 1&lt;/h1&gt;
+&lt;h1 id=&#34;day-1&#34;&gt;Day 1&lt;/h1&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;Kubernetes 1.2 available by end of March 2016&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Kubernetes 1.2 available by end of March 2016 - UPDATE: &lt;a href=&#34;https://github.com/kubernetes/kubernetes/releases/tag/v1.2.0&#34;&gt;Released on March17&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/kubernetes/kubernetes/pull/19042&#34;&gt;ReplicaSets&lt;/a&gt; - ReplicaSets support a more generic selector compared to Replication Controllers - &lt;a href=&#34;http://kubernet.es/docs/user-guide/labels/#set-based-requirement&#34;&gt;explanation of difference&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/deployment.md&#34;&gt;Deployments&lt;/a&gt; manage ReplicaSets based on a template. Updating the template will make deployments act based on the difference of Desired vs Actual state, i.e. version updates will result in a rolling update (w/ zero downtime)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/deployment.md&#34;&gt;Deployments&lt;/a&gt; manage ReplicaSets based on a template. Updating the template will make deployments act based on the difference of Desired vs Actual state, i.e. version updates will result in a rolling update (w/ zero downtime) - Released on &lt;a href=&#34;http://kubernetes.io/docs/user-guide/deployments/&#34;&gt;Deployment Docs&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/eBay/Kubernetes/blob/master/docs/proposals/configmap.md&#34;&gt;Config Maps&lt;/a&gt; - late-binding, live-updated and atomic. Take the pod configuration out of the pod and let the kubelet provision it (either as env vars or config files mounted into the pod). Secrets were used to late bind config, Config Maps are designed as a better solution for this requirement. (see also: &lt;a href=&#34;https://github.com/kubernetes/kubernetes/issues/12732&#34;&gt;Kubernetes/Issues/12732&lt;/a&gt; - Keys/Certs generation for services)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/eBay/Kubernetes/blob/master/docs/proposals/configmap.md&#34;&gt;Config Maps&lt;/a&gt; - &lt;a href=&#34;http://kubernetes.io/docs/user-guide/configmap/&#34;&gt;ConfigMap docs&lt;/a&gt; - late-binding, live-updated and atomic. Take the pod configuration out of the pod and let the kubelet provision it (either as env vars or config files mounted into the pod). Secrets were used to late bind config, Config Maps are designed as a better solution for this requirement. (see also: &lt;a href=&#34;https://github.com/kubernetes/kubernetes/issues/12732&#34;&gt;Kubernetes/Issues/12732&lt;/a&gt; - Keys/Certs generation for services)&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://kubernetes.io/docs/admin/daemons/&#34;&gt;DaemonSet&lt;/a&gt; (i.e. cluster-wide node agents for logging / networking / storage / &amp;hellip; )&lt;/p&gt;&lt;/li&gt;
 
@@ -81,7 +84,7 @@
 &lt;/blockquote&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/6Bc9/creating-an-advanced-load-balancing-solution-hellip&#34;&gt;Extending Services &amp;amp; Ingress with nginx&lt;/a&gt; &lt;a href=&#34;https://github.com/nginxinc/kubernetes-ingress&#34;&gt;repo&lt;/a&gt; - in &lt;a href=&#34;https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party&#34;&gt;contrib&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/6Bc9/creating-an-advanced-load-balancing-solution-hellip&#34;&gt;Extending Services &amp;amp; Ingress with nginx&lt;/a&gt; see &lt;a href=&#34;https://github.com/nginxinc/kubernetes-ingress&#34;&gt;repo&lt;/a&gt; - also in &lt;a href=&#34;https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party&#34;&gt;contrib&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/6BYB/custom-volume-plugins&#34;&gt;Kubernetes Volume plugins&lt;/a&gt; - &lt;a href=&#34;https://speakerdeck.com/agonzalezro/custom-volume-plugins&#34;&gt;slides&lt;/a&gt; by &lt;a href=&#34;https://twitter.com/agonzalezro&#34;&gt;@agonzalezro&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 
@@ -124,10 +127,10 @@
 &lt;li&gt;&lt;p&gt;RedHat OpenShift: &lt;a href=&#34;http://rhelblog.redhat.com/2016/02/23/the-red-hat-ecosystem-for-microservice-and-container-development/&#34;&gt;The Red Hat Ecosystem for Microservice and Container Development&lt;/a&gt; - &lt;a href=&#34;https://blog.openshift.com/tag/kubernetes/&#34;&gt;tag: Kubernetes&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&#34;day-2:3b7fb9cf5e36b8b80caf14cf71cdf18e&#34;&gt;Day 2&lt;/h1&gt;
+&lt;h1 id=&#34;day-2&#34;&gt;Day 2&lt;/h1&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/68lU/day-2-keynote-pushing-kubernetes-forward&#34;&gt;Pushing Kubernetes Forward&lt;/a&gt;&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/68lU/day-2-keynote-pushing-kubernetes-forward&#34;&gt;Pushing Kubernetes Forward&lt;/a&gt; - &lt;a href=&#34;https://speakerdeck.com/philips/pushing-kubernetes-forward&#34;&gt;slides&lt;/a&gt;&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://github.com/polvi/monokube&#34;&gt;polvi/monokube&lt;/a&gt; by &lt;a href=&#34;https://twitter.com/polvi&#34;&gt;@polvi&lt;/a&gt;&lt;/li&gt;
@@ -164,7 +167,7 @@
 &lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/6BUp/trading-in-the-kube&#34;&gt;Trading in the Kube&lt;/a&gt; Note: &lt;a href=&#34;http://adaptiveconsulting.github.io/ReactiveTraderJS&#34;&gt;AdaptiveConsulting/ReactiveTraderCloud&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Last updated: Tuesday, March 15&lt;/p&gt;
+&lt;p&gt;Last updated: Wednesday, March 17&lt;/p&gt;
 </description>
     </item>
     
@@ -190,7 +193,7 @@
 
 &lt;p&gt;I estimate it takes about 3 hours to work through the guide.&lt;/p&gt;
 
-&lt;h3 id=&#34;digital-ocean-article-preview-do-preview-how-to-provision-a-kubernetes-cluster-using-coreos-html&#34;&gt;&lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;Digital Ocean Article Preview&lt;/a&gt;&lt;/h3&gt;
+&lt;h3 id=&#34;digital-ocean-article-preview-do-preview-how-to-provision-a-kubernetes-cluster-using-coreos-html:a91459261407d5d36808cf519d4f7594&#34;&gt;&lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;Digital Ocean Article Preview&lt;/a&gt;&lt;/h3&gt;
 
 &lt;p&gt;Using the &lt;a href=&#34;https://www.digitalocean.com/community/markdown&#34;&gt;Markdown Preview Generator from Digital Ocean&lt;/a&gt; I generated and copied the article preview &lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos-v2.html&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 

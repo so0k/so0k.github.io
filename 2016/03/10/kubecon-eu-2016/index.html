@@ -59,7 +59,7 @@
     },
     "datePublished": "2016-03-10",
     "description": "Aggregation of data from KubeCon EU 2016",
-    "wordCount":  896 
+    "wordCount":  924 
   }
 </script>
 
@@ -187,7 +187,7 @@
     &middot; by Vincent De Smet
   
   &middot; Read in about 5 min
-  &middot; (896 Words)
+  &middot; (924 Words)
 </small>
 
 
@@ -220,30 +220,33 @@
 
 <ul>
 <li><a href="https://corekube.com/2016/03/10/kubecon-london-2016-day-1/">corekube.com Day 1 Summary</a></li>
-<li><a href="http://livewyer.com/blog/2016/03/10/kubecon-eu-day-1-summary">livewyer.com/ Day 1 Summary</a></li>
+<li><a href="http://livewyer.com/blog/2016/03/10/kubecon-eu-day-1-summary">livewyer.com Day 1 Summary</a></li>
 </ul>
 
 <p>&amp; Summaries after the Conference finished:</p>
 
 <ul>
 <li><a href="https://corekube.com/2016/03/11/kubecon-london-2016-day-2/">corekube.com Day 2 Summary</a></li>
+<li><a href="http://www.livewyer.com/blog/2016/03/14/kubecon-europe-day-2-summary-and-retrospective">livewyer.com Day 2 Summary</a></li>
 <li><a href="http://techapostle.blogspot.com/2016/03/insights-from-kubecon-eu-2016.html">Insights from Kubernetes</a></li>
 <li><a href="http://www.benjvi.com/2016/03/13/tldr-kubecon">TL/DR: KubeCon</a></li>
 <li><a href="http://qaware.blogspot.in/2016/03/kubecon-2016-recap.html">QAware Kubecon Recap</a></li>
+<li><a href="https://macyves.wordpress.com/2016/03/16/kubecon-16-for-me-inspiration-community-and-strategic-validation/">Kubecon for me</a></li>
+<li><a href="https://www.flexiant.com/2016/03/16/the-aftermath-of-kubecon-eu/">Aftermath of KubeCon EU</a></li>
 </ul>
 
 <p>What I pieced together from the Twitter Stream:</p>
 
-<h1 id="day-1:3b7fb9cf5e36b8b80caf14cf71cdf18e">Day 1</h1>
+<h1 id="day-1">Day 1</h1>
 
 <ul>
-<li><p>Kubernetes 1.2 available by end of March 2016</p></li>
+<li><p>Kubernetes 1.2 available by end of March 2016 - UPDATE: <a href="https://github.com/kubernetes/kubernetes/releases/tag/v1.2.0">Released on March17</a></p></li>
 
 <li><p><a href="https://github.com/kubernetes/kubernetes/pull/19042">ReplicaSets</a> - ReplicaSets support a more generic selector compared to Replication Controllers - <a href="http://kubernet.es/docs/user-guide/labels/#set-based-requirement">explanation of difference</a></p></li>
 
-<li><p><a href="https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/deployment.md">Deployments</a> manage ReplicaSets based on a template. Updating the template will make deployments act based on the difference of Desired vs Actual state, i.e. version updates will result in a rolling update (w/ zero downtime)</p></li>
+<li><p><a href="https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/deployment.md">Deployments</a> manage ReplicaSets based on a template. Updating the template will make deployments act based on the difference of Desired vs Actual state, i.e. version updates will result in a rolling update (w/ zero downtime) - Released on <a href="http://kubernetes.io/docs/user-guide/deployments/">Deployment Docs</a></p></li>
 
-<li><p><a href="https://github.com/eBay/Kubernetes/blob/master/docs/proposals/configmap.md">Config Maps</a> - late-binding, live-updated and atomic. Take the pod configuration out of the pod and let the kubelet provision it (either as env vars or config files mounted into the pod). Secrets were used to late bind config, Config Maps are designed as a better solution for this requirement. (see also: <a href="https://github.com/kubernetes/kubernetes/issues/12732">Kubernetes/Issues/12732</a> - Keys/Certs generation for services)</p></li>
+<li><p><a href="https://github.com/eBay/Kubernetes/blob/master/docs/proposals/configmap.md">Config Maps</a> - <a href="http://kubernetes.io/docs/user-guide/configmap/">ConfigMap docs</a> - late-binding, live-updated and atomic. Take the pod configuration out of the pod and let the kubelet provision it (either as env vars or config files mounted into the pod). Secrets were used to late bind config, Config Maps are designed as a better solution for this requirement. (see also: <a href="https://github.com/kubernetes/kubernetes/issues/12732">Kubernetes/Issues/12732</a> - Keys/Certs generation for services)</p></li>
 
 <li><p><a href="http://kubernetes.io/docs/admin/daemons/">DaemonSet</a> (i.e. cluster-wide node agents for logging / networking / storage / &hellip; )</p></li>
 
@@ -273,7 +276,7 @@
 </blockquote>
 
 <ul>
-<li><p><a href="https://kubeconeurope2016.sched.org/event/6Bc9/creating-an-advanced-load-balancing-solution-hellip">Extending Services &amp; Ingress with nginx</a> <a href="https://github.com/nginxinc/kubernetes-ingress">repo</a> - in <a href="https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party">contrib</a></p></li>
+<li><p><a href="https://kubeconeurope2016.sched.org/event/6Bc9/creating-an-advanced-load-balancing-solution-hellip">Extending Services &amp; Ingress with nginx</a> see <a href="https://github.com/nginxinc/kubernetes-ingress">repo</a> - also in <a href="https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party">contrib</a></p></li>
 
 <li><p><a href="https://kubeconeurope2016.sched.org/event/6BYB/custom-volume-plugins">Kubernetes Volume plugins</a> - <a href="https://speakerdeck.com/agonzalezro/custom-volume-plugins">slides</a> by <a href="https://twitter.com/agonzalezro">@agonzalezro</a></p></li>
 
@@ -316,10 +319,10 @@
 <li><p>RedHat OpenShift: <a href="http://rhelblog.redhat.com/2016/02/23/the-red-hat-ecosystem-for-microservice-and-container-development/">The Red Hat Ecosystem for Microservice and Container Development</a> - <a href="https://blog.openshift.com/tag/kubernetes/">tag: Kubernetes</a></p></li>
 </ul>
 
-<h1 id="day-2:3b7fb9cf5e36b8b80caf14cf71cdf18e">Day 2</h1>
+<h1 id="day-2">Day 2</h1>
 
 <ul>
-<li><p><a href="https://kubeconeurope2016.sched.org/event/68lU/day-2-keynote-pushing-kubernetes-forward">Pushing Kubernetes Forward</a></p>
+<li><p><a href="https://kubeconeurope2016.sched.org/event/68lU/day-2-keynote-pushing-kubernetes-forward">Pushing Kubernetes Forward</a> - <a href="https://speakerdeck.com/philips/pushing-kubernetes-forward">slides</a></p>
 
 <ul>
 <li><a href="https://github.com/polvi/monokube">polvi/monokube</a> by <a href="https://twitter.com/polvi">@polvi</a></li>
@@ -356,7 +359,7 @@
 <li><p><a href="https://kubeconeurope2016.sched.org/event/6BUp/trading-in-the-kube">Trading in the Kube</a> Note: <a href="http://adaptiveconsulting.github.io/ReactiveTraderJS">AdaptiveConsulting/ReactiveTraderCloud</a></p></li>
 </ul>
 
-<p>Last updated: Tuesday, March 15</p>
+<p>Last updated: Wednesday, March 17</p>
 
 </div>
 
