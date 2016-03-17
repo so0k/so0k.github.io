@@ -42,7 +42,7 @@
 
 &lt;p&gt;What I pieced together from the Twitter Stream:&lt;/p&gt;
 
-&lt;h1 id=&#34;day-1&#34;&gt;Day 1&lt;/h1&gt;
+&lt;h1 id=&#34;day-1:3b7fb9cf5e36b8b80caf14cf71cdf18e&#34;&gt;Day 1&lt;/h1&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;Kubernetes 1.2 available by end of March 2016&lt;/p&gt;&lt;/li&gt;
@@ -81,7 +81,7 @@
 &lt;/blockquote&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/6Bc9/creating-an-advanced-load-balancing-solution-hellip&#34;&gt;Extending Services &amp;amp; Ingress with nginx&lt;/a&gt; - in &lt;a href=&#34;https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party&#34;&gt;contrib&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/6Bc9/creating-an-advanced-load-balancing-solution-hellip&#34;&gt;Extending Services &amp;amp; Ingress with nginx&lt;/a&gt; &lt;a href=&#34;https://github.com/nginxinc/kubernetes-ingress&#34;&gt;repo&lt;/a&gt; - in &lt;a href=&#34;https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party&#34;&gt;contrib&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/6BYB/custom-volume-plugins&#34;&gt;Kubernetes Volume plugins&lt;/a&gt; - &lt;a href=&#34;https://speakerdeck.com/agonzalezro/custom-volume-plugins&#34;&gt;slides&lt;/a&gt; by &lt;a href=&#34;https://twitter.com/agonzalezro&#34;&gt;@agonzalezro&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 
@@ -124,7 +124,7 @@
 &lt;li&gt;&lt;p&gt;RedHat OpenShift: &lt;a href=&#34;http://rhelblog.redhat.com/2016/02/23/the-red-hat-ecosystem-for-microservice-and-container-development/&#34;&gt;The Red Hat Ecosystem for Microservice and Container Development&lt;/a&gt; - &lt;a href=&#34;https://blog.openshift.com/tag/kubernetes/&#34;&gt;tag: Kubernetes&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&#34;day-2&#34;&gt;Day 2&lt;/h1&gt;
+&lt;h1 id=&#34;day-2:3b7fb9cf5e36b8b80caf14cf71cdf18e&#34;&gt;Day 2&lt;/h1&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/68lU/day-2-keynote-pushing-kubernetes-forward&#34;&gt;Pushing Kubernetes Forward&lt;/a&gt;&lt;/p&gt;
@@ -178,7 +178,7 @@
 
 &lt;p&gt;&lt;strong&gt;Docker 1.10 is coming&lt;/strong&gt; and as with any release in the ever fast moving world of Docker, it is good to find out more about the use cases for the newly introduced commands, below is a list of the interesting changes that stood out for me so far:&lt;/p&gt;
 
-&lt;h3 id=&#34;container-mutability-and-the-new-docker-update-command&#34;&gt;Container Mutability and the new &lt;code&gt;docker update&lt;/code&gt; command&lt;/h3&gt;
+&lt;h3 id=&#34;container-mutability-and-the-new-docker-update-command:61aa534034babfc14972e5e817552dee&#34;&gt;Container Mutability and the new &lt;code&gt;docker update&lt;/code&gt; command&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://github.com/docker/docker/pull/15078&#34;&gt;Relevant pull request&lt;/a&gt;&lt;/p&gt;
 
@@ -245,7 +245,7 @@ systemctl show docker-4be96b853089bc6044b29cb873cac460b429cfcbdd0e877c0868eb2a90
 
 &lt;p&gt;Adding support for exposing ports, changing container restart policies and &lt;a href=&#34;https://github.com/docker/docker/pull/18958&#34;&gt;labels&lt;/a&gt; are being worked on , but do not seem to be planned for the 1.10 release, but what about &lt;code&gt;Environment variables&lt;/code&gt;?&lt;/p&gt;
 
-&lt;h3 id=&#34;container-network-model-service-discovery&#34;&gt;Container Network Model - Service Discovery&lt;/h3&gt;
+&lt;h3 id=&#34;container-network-model-service-discovery:61aa534034babfc14972e5e817552dee&#34;&gt;Container Network Model - Service Discovery&lt;/h3&gt;
 
 &lt;p&gt;With the 1.9 release, Docker moved its networking libraries from the experimental branch to the production ready branch. Networking brought a big change in the way containers find each other, deprecating Docker links as well as adding cross-host support with overlay (vxlan) networks (replacing the ambassador container pattern).&lt;/p&gt;
 
@@ -273,7 +273,7 @@ systemctl show docker-4be96b853089bc6044b29cb873cac460b429cfcbdd0e877c0868eb2a90
 
 &lt;p&gt;Well, this isn&amp;rsquo;t really an issue if you have a local Docker daemon (I still had a CoreOS VM with a Nodejs image ready). But if you&amp;rsquo;re on Windows, you had to do some leg work in advance, I will go through the Windows steps as well. If you do not have an appropriate Windows environment set up already, it will obviously be a LOT faster to simply install NodeJS, but I had everything pre-configured so this really just took me 5 minutes (no lies, I promise!).&lt;/p&gt;
 
-&lt;h2 id=&#34;ensure-your-docker-daemon-is-running&#34;&gt;Ensure your Docker Daemon is running&lt;/h2&gt;
+&lt;h2 id=&#34;ensure-your-docker-daemon-is-running:91365d17c2334facda03bb4e3d4f873d&#34;&gt;Ensure your Docker Daemon is running&lt;/h2&gt;
 
 &lt;p&gt;Bring up the VM with PowerShell (Run As Administrator required &amp;amp; assuming you had created a CoreOS VM previously):&lt;/p&gt;
 
@@ -292,7 +292,7 @@ systemctl show docker-4be96b853089bc6044b29cb873cac460b429cfcbdd0e877c0868eb2a90
 
 &lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: You can get the IP of the VM using the &lt;code&gt;lvms&lt;/code&gt; alias I described &lt;a href=&#34;http://so0k.github.io/2016/01/07/about-this-blog-and-my-setup&#34;&gt;here&lt;/a&gt; or just read it from the Virtual Machine Connection &lt;code&gt;vmconnect&lt;/code&gt; window if you opened it earlier.&lt;/p&gt;
 
-&lt;h2 id=&#34;optionally-mount-windows-host-files-to-your-coreos-vm&#34;&gt;Optionally, Mount Windows host files to your CoreOS VM&lt;/h2&gt;
+&lt;h2 id=&#34;optionally-mount-windows-host-files-to-your-coreos-vm:91365d17c2334facda03bb4e3d4f873d&#34;&gt;Optionally, Mount Windows host files to your CoreOS VM&lt;/h2&gt;
 
 &lt;p&gt;I had already configured my CoreOS to mount shared folders from my Windows host, here are the steps to achieve this, if you can&amp;rsquo;t do this yet:&lt;/p&gt;
 
@@ -352,7 +352,7 @@ export SMB_USER=my.username
 &lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h2 id=&#34;start-a-nodejs-container-and-install-jsonresume&#34;&gt;Start a NodeJS container and install jsonresume&lt;/h2&gt;
+&lt;h2 id=&#34;start-a-nodejs-container-and-install-jsonresume:91365d17c2334facda03bb4e3d4f873d&#34;&gt;Start a NodeJS container and install jsonresume&lt;/h2&gt;
 
 &lt;p&gt;Create a new container using the official NodeJS Docker Image (no tag = latest tag), this will be pulled if you do not have an image already. (I can only confirm this works with &lt;code&gt;node:0.12&lt;/code&gt; which is the version I already had on my daemon)&lt;/p&gt;
 
@@ -407,7 +407,7 @@ cd /mnt/win/jsonresume
 
 &lt;p&gt;I estimate it takes about 3 hours to work through the guide.&lt;/p&gt;
 
-&lt;h3 id=&#34;digital-ocean-article-preview-do-preview-how-to-provision-a-kubernetes-cluster-using-coreos-html:a91459261407d5d36808cf519d4f7594&#34;&gt;&lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;Digital Ocean Article Preview&lt;/a&gt;&lt;/h3&gt;
+&lt;h3 id=&#34;digital-ocean-article-preview-do-preview-how-to-provision-a-kubernetes-cluster-using-coreos-html&#34;&gt;&lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos.html&#34;&gt;Digital Ocean Article Preview&lt;/a&gt;&lt;/h3&gt;
 
 &lt;p&gt;Using the &lt;a href=&#34;https://www.digitalocean.com/community/markdown&#34;&gt;Markdown Preview Generator from Digital Ocean&lt;/a&gt; I generated and copied the article preview &lt;a href=&#34;http://so0k.github.io/do/preview/how-to-provision-a-kubernetes-cluster-using-coreos-v2.html&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 

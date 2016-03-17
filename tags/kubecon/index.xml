@@ -42,7 +42,7 @@
 
 &lt;p&gt;What I pieced together from the Twitter Stream:&lt;/p&gt;
 
-&lt;h1 id=&#34;day-1&#34;&gt;Day 1&lt;/h1&gt;
+&lt;h1 id=&#34;day-1:3b7fb9cf5e36b8b80caf14cf71cdf18e&#34;&gt;Day 1&lt;/h1&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;Kubernetes 1.2 available by end of March 2016&lt;/p&gt;&lt;/li&gt;
@@ -81,7 +81,7 @@
 &lt;/blockquote&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/6Bc9/creating-an-advanced-load-balancing-solution-hellip&#34;&gt;Extending Services &amp;amp; Ingress with nginx&lt;/a&gt; - in &lt;a href=&#34;https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party&#34;&gt;contrib&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/6Bc9/creating-an-advanced-load-balancing-solution-hellip&#34;&gt;Extending Services &amp;amp; Ingress with nginx&lt;/a&gt; &lt;a href=&#34;https://github.com/nginxinc/kubernetes-ingress&#34;&gt;repo&lt;/a&gt; - in &lt;a href=&#34;https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx-third-party&#34;&gt;contrib&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/6BYB/custom-volume-plugins&#34;&gt;Kubernetes Volume plugins&lt;/a&gt; - &lt;a href=&#34;https://speakerdeck.com/agonzalezro/custom-volume-plugins&#34;&gt;slides&lt;/a&gt; by &lt;a href=&#34;https://twitter.com/agonzalezro&#34;&gt;@agonzalezro&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 
@@ -124,7 +124,7 @@
 &lt;li&gt;&lt;p&gt;RedHat OpenShift: &lt;a href=&#34;http://rhelblog.redhat.com/2016/02/23/the-red-hat-ecosystem-for-microservice-and-container-development/&#34;&gt;The Red Hat Ecosystem for Microservice and Container Development&lt;/a&gt; - &lt;a href=&#34;https://blog.openshift.com/tag/kubernetes/&#34;&gt;tag: Kubernetes&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&#34;day-2&#34;&gt;Day 2&lt;/h1&gt;
+&lt;h1 id=&#34;day-2:3b7fb9cf5e36b8b80caf14cf71cdf18e&#34;&gt;Day 2&lt;/h1&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://kubeconeurope2016.sched.org/event/68lU/day-2-keynote-pushing-kubernetes-forward&#34;&gt;Pushing Kubernetes Forward&lt;/a&gt;&lt;/p&gt;
