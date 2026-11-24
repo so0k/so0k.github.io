@@ -1,0 +1,125 @@
+:root {
+  --bg: #fbfaf8;
+  --fg: #1f2328;
+  --muted: #5f6670;
+  --link: #1f5fa8;
+  --badge-bg: #e3eefb;
+  --badge-fg: #1f5fa8;
+  --rule: #e6e3de;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16181c;
+    --fg: #e6e7e9;
+    --muted: #9aa1ab;
+    --link: #8ab8f0;
+    --badge-bg: #23344a;
+    --badge-fg: #b6d3f5;
+    --rule: #2a2e35;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+
+body { margin: 0; }
+
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 4.5rem 1.25rem 3rem;
+}
+
+a { color: var(--link); text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 2px; }
+
+.byline {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+h1 {
+  margin: 0.2rem 0 0.6rem;
+  font-size: 2.4rem;
+  line-height: 1.15;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.intro {
+  margin: 0 0 3rem;
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.workshops {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.workshops li + li { margin-top: 2.5rem; }
+
+h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.25rem;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+h2 a { color: inherit; text-decoration-color: var(--rule); text-decoration-thickness: 2px; }
+h2 a:hover { color: var(--link); text-decoration-color: currentColor; }
+
+.badge {
+  display: inline-block;
+  vertical-align: 0.15em;
+  margin-right: 0.2rem;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+article p { margin: 0 0 0.5rem; }
+
+.tags {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+footer {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+footer p { margin: 0 0 0.4rem; }
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+}
+
+@media (max-width: 480px) {
+  html { font-size: 16px; }
+  main { padding-top: 3rem; }
+  h1 { font-size: 2rem; }
+}
